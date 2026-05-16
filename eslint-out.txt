@@ -1,0 +1,12 @@
+﻿
+C:\Users\bishw\source\repos\cafeSystem\cafeSystem\Source\cafe\src\Pages\Cashier\CashClosing.jsx
+  26:6  warning  React Hook useEffect has a missing dependency: 'loadReport'. Either include it or remove the dependency array                                 react-hooks/exhaustive-deps
+  45:6  warning  React Hook useEffect has a missing dependency: 'loadReport'. Either include it or remove the dependency array                                 react-hooks/exhaustive-deps
+  92:6  warning  React Hook useEffect has missing dependencies: 'executeSubmission' and 'getExpectedCash'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\bishw\source\repos\cafeSystem\cafeSystem\Source\cafe\src\Pages\Manager\CashClosingReport.jsx
+  16:6  warning  React Hook useEffect has a missing dependency: 'loadReport'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  35:6  warning  React Hook useEffect has a missing dependency: 'loadReport'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Ô£û 5 problems (0 errors, 5 warnings)
+
