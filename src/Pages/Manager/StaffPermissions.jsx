@@ -52,23 +52,9 @@ export default function StaffPermissions() {
     loadStaff();
   }, []);
 
-  useEffect(() => {
-    if (!connection) return;
-
-    const handleUpdate = () => {
-      loadStaff();
-    };
-
-    connection.on('NewOrder', handleUpdate);
-    connection.on('OrderUpdated', handleUpdate);
-    connection.on('PaymentUpdate', handleUpdate);
-
-    return () => {
-      connection.off('NewOrder', handleUpdate);
-      connection.off('OrderUpdated', handleUpdate);
-      connection.off('PaymentUpdate', handleUpdate);
-    };
-  }, [connection]);
+  // NOTE: No SignalR listeners here — order/payment events are irrelevant to staff
+  // data and were previously causing loadStaff() to fire on every cafe activity,
+  // which overwrote any permissions the manager had just saved.
 
   async function loadStaff() {
     try {
@@ -139,8 +125,24 @@ export default function StaffPermissions() {
             });
 
             if (existingIndex >= 0) {
-              // Update existing member with API data
-              merged[existingIndex] = { ...merged[existingIndex], ...apiMember };
+              // Merge API data but ALWAYS use the API permissions as the
+              // authoritative value — the DB is the single source of truth.
+              // After handleSavePermissions succeeds, we already update the
+              // local staff state directly, so the next loadStaff() should
+              // simply reflect whatever the DB now holds.
+              const resolvedPerms = (apiMember.permissions !== undefined && apiMember.permissions !== null)
+                ? apiMember.permissions
+                : (apiMember.Permissions !== undefined && apiMember.Permissions !== null)
+                  ? apiMember.Permissions
+                  : (merged[existingIndex].permissions ?? merged[existingIndex].Permissions ?? '');
+              merged[existingIndex] = {
+                ...merged[existingIndex],
+                ...apiMember,
+                // Use explicit null/undefined check — empty string '' means
+                // "all permissions disabled" and must NOT be treated as falsy.
+                permissions: resolvedPerms,
+                Permissions: resolvedPerms,
+              };
             } else {
               // Add new member from API
               merged.push(apiMember);
