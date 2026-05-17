@@ -5,7 +5,7 @@ import {
   FaExclamationTriangle, FaTimes, FaPlus, FaMinus,
   FaSearch, FaFilter, FaSort, FaBox, FaBoxes, FaExclamationCircle,
   FaCalendarTimes, FaChevronLeft, FaChevronRight,
-  FaPlayCircle, FaClock, FaMoneyBillWave, FaArchive, FaUndo,
+  FaClock, FaMoneyBillWave, FaArchive, FaUndo,
   FaPencilAlt, FaInfoCircle
 } from 'react-icons/fa';
 import { getJson, putJson, postJson, deleteJson } from '../../utils/api';
@@ -125,8 +125,7 @@ export default function StockTracking() {
   // Drawer
   const [drawerItem, setDrawerItem] = useState(null);
 
-  // Apply usage
-  const [applyingUsage, setApplyingUsage] = useState(false);
+
 
   // Confirm modal
   const [confirmModal, setConfirmModal] = useState({
@@ -207,24 +206,7 @@ export default function StockTracking() {
 
   const needsReorderItems = stockItems.filter(i => i.needsReorder || i.outOfStock);
 
-  // ─── Apply Daily Usage ─────────────────────────────────────────
 
-  async function handleApplyDailyUsage() {
-    setApplyingUsage(true);
-    try {
-      const res = await postJson('/api/stock/apply-daily-usage', {});
-      if (res.newlyBreachedCount > 0) {
-        addToast(`Daily usage applied. ${res.newlyBreachedCount} product(s) now need reorder!`, 'error');
-      } else {
-        addToast('Daily usage applied for all products');
-      }
-      await loadStockItems();
-    } catch (err) {
-      addToast(err.message || 'Failed to apply daily usage', 'error');
-    } finally {
-      setApplyingUsage(false);
-    }
-  }
 
   // ─── CRUD ──────────────────────────────────────────────────────
 
@@ -430,7 +412,7 @@ export default function StockTracking() {
 
   // ─── Render ───────────────────────────────────────────────────────
 
-  const itemsWithUsage = stockItems.filter(i => i.dailyUsageRate > 0);
+
 
   return (
     <div className="stock-tracking">
@@ -443,12 +425,6 @@ export default function StockTracking() {
           <p className="standard-page-subtitle">Track and manage cafe inventory</p>
         </div>
         <div className="standard-page-header-actions">
-          {itemsWithUsage.length > 0 && (
-            <button className="st-btn-apply-usage" onClick={handleApplyDailyUsage} disabled={applyingUsage}>
-              {applyingUsage ? <><div className="st-spinner-inline" /> Applying…</> : <><FaPlayCircle /> Apply Today's Usage</>}
-            </button>
-          )}
-
           <button className="btn-primary" onClick={() => setShowForm(true)}><FaPlus /> New Product</button>
         </div>
       </header>

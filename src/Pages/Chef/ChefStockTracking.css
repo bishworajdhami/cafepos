@@ -165,13 +165,13 @@
 }
 
 .st-btn-apply-usage {
-  background: linear-gradient(135deg, var(--st-primary), var(--st-primary-dark));
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: white;
-  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35);
 }
 
 .st-btn-apply-usage:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--st-primary-dark), #059669);
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
   transform: translateY(-1px);
 }
 
