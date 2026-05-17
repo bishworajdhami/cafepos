@@ -35,6 +35,7 @@ export default function CashierDashboard() {
   const [userName, setUserName] = useState(localStorage.getItem('name') || localStorage.getItem('email') || 'Profile');
   const [profilePictureUrl, setProfilePictureUrl] = useState(localStorage.getItem('profilePictureUrl') || '');
   const [loading, setLoading] = useState(!localStorage.getItem('cachedCafeName'));
+  const [livePermissions, setLivePermissions] = useState(localStorage.getItem('permissions') || '');
   const [isHeaderVisible, setIsHeaderVisible] = useState(() => {
     return localStorage.getItem('cashier_header_visible') !== 'false';
   });
@@ -47,6 +48,7 @@ export default function CashierDashboard() {
 
   useEffect(() => {
     loadSettings();
+    refreshPermissions();
   }, []);
 
   useEffect(() => {
@@ -77,18 +79,31 @@ export default function CashierDashboard() {
     }
   }
 
+  async function refreshPermissions() {
+    try {
+      const data = await getJson('/api/auth/me');
+      if (data && data.permissions !== undefined) {
+        const perms = data.permissions || '';
+        setLivePermissions(perms);
+        localStorage.setItem('permissions', perms);
+      }
+    } catch (err) {
+      console.error('Failed to refresh permissions:', err);
+    }
+  }
+
   function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/login');
   }
 
-  // Helper to check permission
+  // Helper to check permission — reads live state, not stale localStorage
   const hasPermission = useCallback((perm) => {
     if (!perm) return true;
-    const permissions = (localStorage.getItem('permissions') || '').split(',');
+    const permissions = livePermissions.split(',').filter(Boolean);
     return permissions.includes(perm);
-  }, []);
+  }, [livePermissions]);
 
   // Filter tabs based on settings and permissions
   const tabs = useMemo(() => allTabs.filter(tab => hasPermission(tab.permission)), [hasPermission]);

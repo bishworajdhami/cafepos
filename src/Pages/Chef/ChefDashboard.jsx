@@ -34,6 +34,7 @@ export default function ChefDashboard() {
     const [userName, setUserName] = useState(localStorage.getItem('name') || localStorage.getItem('email') || 'Profile');
     const [profilePictureUrl, setProfilePictureUrl] = useState(localStorage.getItem('profilePictureUrl') || '');
     const [loading, setLoading] = useState(!localStorage.getItem('cachedCafeName'));
+    const [livePermissions, setLivePermissions] = useState(localStorage.getItem('permissions') || '');
     const [isHeaderVisible, setIsHeaderVisible] = useState(() => {
         return localStorage.getItem('chef_header_visible') !== 'false';
     });
@@ -46,6 +47,7 @@ export default function ChefDashboard() {
 
     useEffect(() => {
         loadSettings();
+        refreshPermissions();
     }, []);
 
     useEffect(() => {
@@ -82,11 +84,24 @@ export default function ChefDashboard() {
         navigate('/login');
     }
 
+    async function refreshPermissions() {
+        try {
+            const data = await getJson('/api/auth/me');
+            if (data && data.permissions !== undefined) {
+                const perms = data.permissions || '';
+                setLivePermissions(perms);
+                localStorage.setItem('permissions', perms);
+            }
+        } catch (err) {
+            console.error('Failed to refresh permissions:', err);
+        }
+    }
+
     const hasPermission = useCallback((perm) => {
         if (!perm) return true;
-        const permissions = (localStorage.getItem('permissions') || '').split(',');
+        const permissions = livePermissions.split(',').filter(Boolean);
         return permissions.includes(perm);
-    }, []);
+    }, [livePermissions]);
 
     const tabs = useMemo(() => allTabs.filter(tab => hasPermission(tab.permission)), [hasPermission]);
 
