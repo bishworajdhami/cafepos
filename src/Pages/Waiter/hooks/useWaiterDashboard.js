@@ -76,7 +76,27 @@ export default function useWaiterDashboard() {
     onConfirm: null
   });
 
-  const playNotificationSound = async () => {
+  const playNotificationSound = async (title = 'Cafe System', body = 'New Notification') => {
+    // 1. Try to trigger a native system notification (plays via Notification volume channel)
+    try {
+      if ('Notification' in window && 'serviceWorker' in navigator && Notification.permission === 'granted') {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration) {
+          await registration.showNotification(title, {
+            body: body,
+            icon: '/logo192.png',
+            vibrate: [200, 100, 200],
+            tag: 'waiter-alert',
+            renotify: true
+          });
+          return; // Skip the media audio fallback since the system handled it
+        }
+      }
+    } catch (err) {
+      console.warn('System notification failed, falling back to media sound', err);
+    }
+
+    // 2. Fallback to Web Audio API (plays via Media volume channel)
     try {
       const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
       if (!AudioContextCtor) return;
@@ -107,11 +127,16 @@ export default function useWaiterDashboard() {
       o2.start(ctx.currentTime + 0.12);
       o2.stop(ctx.currentTime + 0.36);
     } catch {
-      // Audio is non-critical for the waiter workflow.
+      // Audio is non-critical
     }
   };
 
   useEffect(() => {
+    // Request notification permissions for true system notification sounds on mobile
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+    
     fetchInitialData();
     const interval = setInterval(fetchTableStatus, 30000);
     return () => clearInterval(interval);
@@ -146,7 +171,10 @@ export default function useWaiterDashboard() {
       };
       setAlerts(prev => [newAlert, ...prev]);
       if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-      playNotificationSound();
+      
+      const title = 'Order Ready!';
+      const body = order.tableNumber ? `Table ${order.tableNumber} order is ready for pickup.` : 'Takeaway order is ready for pickup.';
+      playNotificationSound(title, body);
     };
 
     const handleUpdate = async () => {
@@ -415,7 +443,7 @@ export default function useWaiterDashboard() {
       setApplyBookingCharge(true);
 
       await fetchTableStatus();
-      playNotificationSound();
+      playNotificationSound('Booking Created', `Table ${selectedTable.table} booked for ${bookingForm.customerName}.`);
     } catch (err) {
       setBookingError(err.message || 'Failed to create booking.');
     } finally {

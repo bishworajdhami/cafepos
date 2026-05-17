@@ -80,7 +80,7 @@ export default function KitchenDisplay() {
                     // 3. This is NOT the very first load of the page
                     if (soundEnabled && hasNewArrival && !isInitialLoad.current) {
                         console.log('[KitchenDisplay] New order(s) detected! Triggering notification sound.');
-                        playNotificationSound();
+                        playNotificationSound('New Order', 'A new order has arrived in the kitchen.');
                     } else if (hasNewArrival && isInitialLoad.current) {
                         console.log('[KitchenDisplay] Initial load: suppression sound for existing orders.');
                     }
@@ -101,6 +101,9 @@ export default function KitchenDisplay() {
     }, [soundEnabled]);
 
     useEffect(() => {
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
         loadOrders();
         loadSettings();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +165,26 @@ export default function KitchenDisplay() {
         return 'standard';
     }
 
-    async function playNotificationSound() {
+    async function playNotificationSound(title = 'Kitchen Display', body = 'New order arrived!') {
+        // 1. Try Native System Notification first (Notification volume channel)
+        try {
+            if ('Notification' in window && 'serviceWorker' in navigator && Notification.permission === 'granted') {
+                const registration = await navigator.serviceWorker.ready;
+                if (registration) {
+                    await registration.showNotification(title, {
+                        body: body,
+                        icon: '/logo192.png',
+                        vibrate: [200, 100, 200],
+                        tag: 'kitchen-alert',
+                        renotify: true
+                    });
+                    return; // Stop here if native push succeeds
+                }
+            }
+        } catch (err) {
+            console.warn('[KitchenDisplay] System notification failed, falling back to media sound', err);
+        }
+
         try {
             console.log('[KitchenDisplay] Attempting to play notification sound...');
             const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -303,7 +325,7 @@ export default function KitchenDisplay() {
                             setSoundEnabled(newState);
                             if (newState) {
                                 // Play a brief test sound to 'unlock' audio in browsers
-                                playNotificationSound();
+                                playNotificationSound('Sound Enabled', 'Kitchen notifications are now active.');
                             }
                         }}
                     >
