@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import OrderListSkeleton from '../../components/skeletons/OrderListSkeleton';
 import TableSkeleton from '../../components/skeletons/TableSkeleton';
 import { useSearchParams } from 'react-router-dom';
@@ -185,8 +186,7 @@ export default function PaymentProcessing() {
 
   async function loadPaymentMethods() {
     try {
-      const cacheBuster = `t=${Date.now()}`;
-      const data = await getJson(`/api/manager/settings?includePaymentMethods=true&${cacheBuster}`);
+      const data = await getJson('/api/manager/settings?includePaymentMethods=true');
       if (data && data.paymentMethods) {
         const methods = typeof data.paymentMethods === 'string'
           ? JSON.parse(data.paymentMethods)
@@ -882,7 +882,7 @@ export default function PaymentProcessing() {
       )}
 
       {/* QR Code Modal */}
-      {showQR && selectedPaymentMethod && (
+      {showQR && selectedPaymentMethod && selectedPaymentMethod.qrCodeImage && createPortal(
         <div className="pp-qr-modal-backdrop" onClick={() => setShowQR(false)}>
           <div className="pp-qr-modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="pp-qr-modal-close" onClick={() => setShowQR(false)}><FaTimes /></button>
@@ -901,23 +901,16 @@ export default function PaymentProcessing() {
               <p className="pp-qr-modal-amount">Amount: NRP {selectedOrder?.total.toFixed(2)}</p>
             )}
 
-            {selectedPaymentMethod.qrCodeImage ? (
-              <div className="pp-qr-modal-image-container">
-                <img src={getImageUrl(selectedPaymentMethod.qrCodeImage)} alt={`${selectedPaymentMethod.name} QR Code`} className="pp-qr-modal-image" />
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '2rem 1rem', color: '#64748b' }}>
-                <FaQrcode style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }} />
-                <p>No QR code uploaded for {selectedPaymentMethod.name}.</p>
-                <p style={{ fontSize: '0.85rem' }}>Please ask a Manager to upload it in Settings.</p>
-              </div>
-            )}
+            <div className="pp-qr-modal-image-container">
+              <img src={getImageUrl(selectedPaymentMethod.qrCodeImage)} alt={`${selectedPaymentMethod.name} QR Code`} className="pp-qr-modal-image" />
+            </div>
 
             <button className="pp-qr-modal-confirm" onClick={() => setShowQR(false)}>
               <FaCheckCircle /> Done (scanned)
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
