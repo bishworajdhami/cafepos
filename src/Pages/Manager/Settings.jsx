@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FaCog, FaCogs, FaExclamationTriangle, FaCheck, FaMobileAlt, FaMoneyBillWave, FaArrowLeft, FaTable, FaSave } from 'react-icons/fa';
+import { FaCog, FaCogs, FaExclamationTriangle, FaCheck, FaMobileAlt, FaMoneyBillWave, FaArrowLeft, FaTable, FaSave, FaTrash } from 'react-icons/fa';
 import { getJson, putJson, postJson, uploadFile, getImageUrl } from '../../utils/api';
 import { useSocket } from '../../SocketContext';
 import './Settings.css';
@@ -498,7 +498,7 @@ export default function Settings() {
     { id: 'cashBalance', title: 'Cash Drawer', icon: <FaMoneyBillWave />, desc: 'Manage cash balances and adjustments' },
 
     { id: 'paymentMethods', title: 'QR Payment Setup', icon: <FaMobileAlt />, desc: 'Mobile payment options and QR codes' },
-    // { id: 'dataManagement', title: 'Data Management', icon: <FaTrash />, desc: 'Dangerous operations like data clearing' }
+    { id: 'dataManagement', title: 'Data Management', icon: <FaTrash />, desc: 'Dangerous operations like data clearing' }
   ];
 
   return (
