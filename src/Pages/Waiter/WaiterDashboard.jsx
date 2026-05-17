@@ -6,7 +6,6 @@ import MenuAvailabilityModal from './components/MenuAvailabilityModal';
 import MenuOrderView from './components/MenuOrderView';
 import ProfileSettingsModal from './components/ProfileSettingsModal';
 import SeatPickerView from './components/SeatPickerView';
-import WaiterAlertsOverlay from './components/WaiterAlertsOverlay';
 import WaiterDashboardViews from './components/WaiterDashboardViews';
 import useWaiterDashboard from './hooks/useWaiterDashboard';
 import './WaiterDashboard.css';
@@ -95,12 +94,6 @@ export default function WaiterDashboard() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <WaiterAlertsOverlay
-        alerts={dashboard.alerts}
-        view={dashboard.view}
-        onDismiss={dashboard.dismissAlert}
-      />
-
       {dashboard.view === 'seats' && (
         <SeatPickerView
           selectedTable={dashboard.selectedTable}
