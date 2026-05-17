@@ -669,7 +669,7 @@ input:checked+.pp-slider:before {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 99999;
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -681,6 +681,7 @@ input:checked+.pp-slider:before {
   max-width: 400px;
   text-align: center;
   position: relative;
+  z-index: 100000;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
