@@ -4,11 +4,9 @@ import StaffSkeleton from '../../components/skeletons/StaffSkeleton';
 import { FaTimes, FaUsersCog, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { getJson, postJson, putJson, deleteJson, getImageUrl } from '../../utils/api';
 import Modal from '../../components/Modal';
-import { useSocket } from '../../SocketContext';
 import './StaffPermissions.css';
 
 export default function StaffPermissions() {
-  const { connection } = useSocket();
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

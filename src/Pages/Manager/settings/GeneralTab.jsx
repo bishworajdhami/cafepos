@@ -27,7 +27,7 @@ export default function GeneralTab({
             <h3><FaBuilding /> Cafe Identity</h3>
             <p>Core branding details for receipts and invoices</p>
           </div>
-          
+
           <div className="settings-panel-content">
             <div className="settings-modern-form">
               <div className="form-row">
@@ -80,7 +80,7 @@ export default function GeneralTab({
             <h3><FaUpload /> Brand Visuals</h3>
             <p>Upload your logo for the dashboard header</p>
           </div>
-          
+
           <div className="settings-panel-content">
             <div className="logo-upload-showcase">
               {cafeLogo ? (
@@ -105,7 +105,7 @@ export default function GeneralTab({
                 </label>
               )}
             </div>
-            
+
             <div className="settings-info-alert">
               <p>Your logo will be automatically optimized and displayed in a 1:1 aspect ratio across the dashboard.</p>
             </div>
@@ -169,7 +169,7 @@ export default function GeneralTab({
             <label className="settings-toggle-row premium">
               <div className="toggle-info">
                 <span className="toggle-label">Pay First Mode</span>
-                <p className="toggle-desc">Skip order summary and go directly to payment screen</p>
+                <p className="toggle-desc">Customer pays before the order is served</p>
               </div>
               <input type="checkbox" className="settings-toggle-switch" checked={payFirst} onChange={e => setPayFirst(e.target.checked)} />
             </label>
