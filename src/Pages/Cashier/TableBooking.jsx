@@ -5,17 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaClock, FaUser, FaPhone, FaMapMarkerAlt, FaFilter, FaSearch, FaPlus, FaTimes, FaCheckCircle } from 'react-icons/fa';
 import { MdTableRestaurant } from 'react-icons/md';
 import { getJson, postJson } from '../../utils/api';
+import {
+    toNepalDateString,
+    parseUtcDate,
+    nepalDatetimeLocalToUtcIso,
+    toNepalDatetimeLocalValue,
+    formatNepalDateTime,
+} from '../../utils/nepalTime';
 import Modal from '../../components/Modal';
 import { useSocket } from '../../SocketContext';
 import './TableBooking.css';
-
-// Helper: returns YYYY-MM-DD in local timezone (avoids UTC date shift near midnight)
-function toLocalDateString(date = new Date()) {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-}
 
 export default function TableBooking() {
     const { connection } = useSocket();
@@ -29,8 +28,8 @@ export default function TableBooking() {
     const [selectedFloor, setSelectedFloor] = useState('all');
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [rangeType, setRangeType] = useState('day'); // 'day', 'week', 'month', 'year', 'custom'
-    const [startDate, setStartDate] = useState(toLocalDateString());
-    const [endDate, setEndDate] = useState(toLocalDateString());
+    const [startDate, setStartDate] = useState(toNepalDateString());
+    const [endDate, setEndDate] = useState(toNepalDateString());
     const [searchQuery, setSearchQuery] = useState('');
     const [viewMode, setViewMode] = useState('visual');
 
@@ -47,7 +46,8 @@ export default function TableBooking() {
         tableNumber: '',
         partySize: 2,
         startTime: '',
-        durationMinutes: 60
+        durationMinutes: 60,
+        isOpenEnded: false,
     });
     const [tableAvailability, setTableAvailability] = useState({ available: true, maxSeats: 1, checking: false });
     const [formError, setFormError] = useState('');
@@ -107,6 +107,7 @@ export default function TableBooking() {
                     startTime: b.startTime,
                     endTime: b.endTime,
                     durationMinutes: b.durationMinutes,
+                    isOpenEnded: b.isOpenEnded ?? (!b.endTime && (b.durationMinutes == null || b.durationMinutes === 0)),
                     status: (b.status || 'active').toLowerCase(),
                     orderId: b.orderId,
                 }));
@@ -229,11 +230,16 @@ export default function TableBooking() {
             const params = new URLSearchParams({
                 floorName: formData.floorName,
                 tableNumber: formData.tableNumber,
-                durationMinutes: formData.durationMinutes.toString()
             });
 
+            if (formData.isOpenEnded) {
+                params.append('openEnded', 'true');
+            } else {
+                params.append('durationMinutes', formData.durationMinutes.toString());
+            }
+
             if (formData.startTime) {
-                params.append('startTime', new Date(formData.startTime).toISOString());
+                params.append('startTime', nepalDatetimeLocalToUtcIso(formData.startTime));
             }
 
             const data = await getJson(`/api/booking/available?${params}`);
@@ -260,7 +266,7 @@ export default function TableBooking() {
             console.error('Failed to check availability:', err);
             setTableAvailability({ available: true, maxSeats: 1, checking: false });
         }
-    }, [formData.floorName, formData.tableNumber, formData.startTime, formData.durationMinutes, tableConfig.floors]);
+    }, [formData.floorName, formData.tableNumber, formData.startTime, formData.durationMinutes, formData.isOpenEnded, tableConfig.floors]);
 
     // Check availability when floor/table/time changes
     useEffect(() => {
@@ -304,6 +310,10 @@ export default function TableBooking() {
             setFormError('Please select start time');
             return;
         }
+        if (!formData.isOpenEnded && (!formData.durationMinutes || formData.durationMinutes < 15)) {
+            setFormError('Minimum duration is 15 minutes, or enable open-ended booking');
+            return;
+        }
 
         try {
             setSubmitting(true);
@@ -314,9 +324,12 @@ export default function TableBooking() {
                 floorName: formData.floorName,
                 tableNumber: formData.tableNumber,
                 partySize: parseInt(formData.partySize),
-                startTime: new Date(formData.startTime).toISOString(),
-                durationMinutes: formData.durationMinutes
+                startTime: nepalDatetimeLocalToUtcIso(formData.startTime),
+                isOpenEnded: formData.isOpenEnded,
             };
+            if (!formData.isOpenEnded) {
+                bookingData.durationMinutes = formData.durationMinutes;
+            }
 
             const response = await postJson('/api/booking/reserve', bookingData);
 
@@ -393,7 +406,8 @@ export default function TableBooking() {
             tableNumber: '',
             partySize: 2,
             startTime: '',
-            durationMinutes: 60
+            durationMinutes: 60,
+            isOpenEnded: false,
         });
         setFormError('');
         setTableAvailability({ available: true, maxSeats: 1, checking: false });
@@ -417,47 +431,43 @@ export default function TableBooking() {
             return status;
         }
 
-        const now = new Date();
-        const bookingStart = new Date(booking.bookingDate || booking.startTime);
+        const now = Date.now();
+        const bookingStart = parseUtcDate(booking.bookingDate || booking.startTime)?.getTime() ?? 0;
 
         if (now < bookingStart) return 'upcoming';
         return 'active';
     }
 
+    function getElapsedLabel(ms) {
+        const hours = Math.floor(ms / 3600000);
+        const minutes = Math.floor((ms % 3600000) / 60000);
+        return `${hours}h ${minutes}m`;
+    }
+
     function getRemainingTime(booking) {
         if (booking.isSynthetic) return 'Occupied';
 
-        const now = new Date();
-        const bookingStart = new Date(booking.bookingDate || booking.startTime);
-        const bookingEnd = new Date(booking.endTime || (bookingStart.getTime() + booking.durationMinutes * 60000));
+        const now = Date.now();
+        const bookingStart = parseUtcDate(booking.bookingDate || booking.startTime)?.getTime() ?? 0;
+        const isOpenEnded = booking.isOpenEnded || (!booking.endTime && !booking.durationMinutes);
+        const bookingEnd = booking.endTime
+            ? (parseUtcDate(booking.endTime)?.getTime() ?? 0)
+            : bookingStart + (booking.durationMinutes || 0) * 60000;
 
         const status = getBookingStatus(booking);
 
         if (status === 'upcoming') {
-            const diff = bookingStart - now;
-            const hours = Math.floor(diff / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
-            return `Starts in ${hours}h ${minutes}m`;
-        } else if (status === 'active') {
+            return `Starts in ${getElapsedLabel(bookingStart - now)}`;
+        }
+        if (status === 'active') {
+            if (isOpenEnded) {
+                return `${getElapsedLabel(now - bookingStart)} elapsed`;
+            }
             const diff = bookingEnd - now;
-            const hours = Math.floor(diff / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
             if (diff < 0) return 'Overdue';
-            return `${hours}h ${minutes}m remaining`;
+            return `${getElapsedLabel(diff)} remaining`;
         }
         return 'Completed';
-    }
-
-    function formatDateTime(dateString) {
-        if (!dateString) return '-';
-        const date = new Date(dateString);
-        return date.toLocaleString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: '2-digit',
-            hour12: true
-        });
     }
 
     const filteredBookings = bookings
@@ -473,7 +483,7 @@ export default function TableBooking() {
         })
         .sort((a, b) => {
             // Latest startTime first
-            return new Date(b.startTime) - new Date(a.startTime);
+            return (parseUtcDate(b.startTime)?.getTime() ?? 0) - (parseUtcDate(a.startTime)?.getTime() ?? 0);
         });
 
     // Reset pagination when filters change
@@ -505,8 +515,8 @@ export default function TableBooking() {
             return;
         }
 
-        setStartDate(toLocalDateString(start));
-        setEndDate(toLocalDateString(end));
+        setStartDate(toNepalDateString(start));
+        setEndDate(toNepalDateString(end));
     }, [rangeType]);
 
     // Pagination Logic
@@ -518,6 +528,11 @@ export default function TableBooking() {
     const changePage = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
+
+    /** True for reservations created with customer name/phone (whole table), not walk-ins */
+    function isNamedTableBooking(booking) {
+        return Boolean(booking && !booking.isSynthetic);
+    }
 
     function getTableBookingStatus(floorName, tableNumber) {
         const tableBookings = bookings.filter(b =>
@@ -689,7 +704,7 @@ export default function TableBooking() {
                         <div className="visual-legend-compact">
                             <div className="legend-dot available"></div> <span>Available</span>
                             <div className="legend-dot active"></div> <span>Occupied</span>
-                            <div className="legend-dot upcoming"></div> <span>Reserved</span>
+                            {/* <div className="legend-dot upcoming"></div> <span>Reserved</span> */}
                         </div>
                     )}
                 </div>
@@ -735,11 +750,15 @@ export default function TableBooking() {
                                             </div>
                                             <div className="booking-detail">
                                                 <FaCalendarAlt className="detail-icon" />
-                                                <span>{formatDateTime(booking.bookingDate || booking.startTime)}</span>
+                                                <span>{formatNepalDateTime(booking.bookingDate || booking.startTime)}</span>
                                             </div>
                                             <div className="booking-detail">
                                                 <FaClock className="detail-icon" />
-                                                <span>{booking.durationMinutes} minutes</span>
+                                                <span>
+                                                    {booking.isOpenEnded
+                                                        ? 'Open-ended (until table is freed)'
+                                                        : `${booking.durationMinutes} minutes`}
+                                                </span>
                                             </div>
                                         </div>
 
@@ -831,14 +850,18 @@ export default function TableBooking() {
                                                         title={tableStatus.booking ?
                                                             `${tableStatus.booking.customerName} - ${getRemainingTime(tableStatus.booking)}` :
                                                             'Available'}
-                                                        onClick={() => setSelectedTableAction({
-                                                            floorName: floor.name,
-                                                            tableNumber,
-                                                            status: tableStatus.status,
-                                                            bookingId: tableStatus.booking?.id,
-                                                            orderId: tableStatus.booking?.orderId,
-                                                            customerName: tableStatus.booking?.customerName
-                                                        })}
+                                                        onClick={() => {
+                                                            setSelectedSeats([]);
+                                                            setSelectedTableAction({
+                                                                floorName: floor.name,
+                                                                tableNumber,
+                                                                status: tableStatus.status,
+                                                                bookingId: tableStatus.booking?.id,
+                                                                orderId: tableStatus.booking?.orderId,
+                                                                customerName: tableStatus.booking?.customerName,
+                                                                isNamedBooking: isNamedTableBooking(tableStatus.booking),
+                                                            });
+                                                        }}
                                                         style={{ cursor: 'pointer', position: 'relative' }}
                                                     >
                                                         <MdTableRestaurant className="table-icon" />
@@ -989,15 +1012,28 @@ export default function TableBooking() {
                                             type="datetime-local"
                                             value={formData.startTime}
                                             onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                                            min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
+                                            min={toNepalDatetimeLocalValue()}
                                             required
                                         />
                                     </div>
 
 
                                     <div className="form-group">
-                                        <label>Booking Duration *</label>
-                                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        <label className="booking-open-ended-option">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.isOpenEnded}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    isOpenEnded: e.target.checked,
+                                                })}
+                                            />
+                                            <span>Open-ended — until order is done and table is freed</span>
+                                        </label>
+                                        {!formData.isOpenEnded && (
+                                        <>
+                                        <label className="booking-duration-label">Booking Duration *</label>
+                                        <div className="booking-duration-fields">
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flex: 1 }}>
                                                 <input
                                                     type="number"
@@ -1030,9 +1066,16 @@ export default function TableBooking() {
                                                 <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>m</span>
                                             </div>
                                         </div>
-                                        <small style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: '0.25rem', display: 'block' }}>
-                                            Total: {formData.durationMinutes} minutes
+                                        <small className="booking-duration-total">
+                                            Total: {formData.durationMinutes} minutes (minimum 15)
                                         </small>
+                                        </>
+                                        )}
+                                        {formData.isOpenEnded && (
+                                            <small className="booking-open-ended-hint">
+                                                Time is counted from start until you free the table. No fixed end time.
+                                            </small>
+                                        )}
                                     </div>
                                 </div>
 
@@ -1092,7 +1135,13 @@ export default function TableBooking() {
                                 )}
                             </div>
 
-                            {/* Seat Selection Section */}
+                            {/* Seat selection only for walk-ins; named bookings reserve the whole table */}
+                            {selectedTableAction.isNamedBooking ? (
+                                <div className="tb-named-booking-notice">
+                                    <p>This table is reserved for <strong>{selectedTableAction.customerName}</strong>.</p>
+                                    <p className="tb-named-booking-sub">The full table is booked — seat selection is not required.</p>
+                                </div>
+                            ) : (
                             <div className="tb-seat-selection-section">
                                 <label className="tb-section-label">Select Seats</label>
                                 <div className="tb-seats-grid-compact">
@@ -1130,15 +1179,24 @@ export default function TableBooking() {
                                     <p className="tb-seat-hint">Please select at least one seat to start an order</p>
                                 )}
                             </div>
+                            )}
 
                             {/* Action Buttons Grid */}
                             <div className="tb-actions-container">
                                 <button
+                                    type="button"
                                     className="tb-action-card tb-action-primary"
-                                    disabled={selectedSeats.length === 0}
+                                    disabled={!selectedTableAction.isNamedBooking && selectedSeats.length === 0}
                                     onClick={() => {
-                                        const seatParams = selectedSeats.join(',');
-                                        navigate(`?tab=orders&floorName=${encodeURIComponent(selectedTableAction.floorName)}&tableNumber=${selectedTableAction.tableNumber}&seatNumbers=${seatParams}`);
+                                        const params = new URLSearchParams({
+                                            tab: 'orders',
+                                            floorName: selectedTableAction.floorName,
+                                            tableNumber: selectedTableAction.tableNumber,
+                                        });
+                                        if (!selectedTableAction.isNamedBooking && selectedSeats.length > 0) {
+                                            params.set('seatNumbers', selectedSeats.join(','));
+                                        }
+                                        navigate(`?${params.toString()}`);
                                     }}
                                 >
                                     <div className="tb-action-icon-box">

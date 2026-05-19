@@ -450,7 +450,12 @@ export default function OrderTaking() {
     if (activeBooking && (linkedBookingId === activeBooking.id) && (applyBookingCharge || forceApply)) {
       const baseCharge = settings.tableBookingCharge || 0;
       const chargeType = settings.tableBookingChargeType || 'per_hour';
-      const duration = activeBooking.durationMinutes || 60;
+      let duration = activeBooking.durationMinutes || 0;
+      if (!duration && activeBooking.startTime) {
+        const start = new Date(activeBooking.startTime).getTime();
+        duration = Math.max(1, Math.ceil((Date.now() - start) / 60000));
+      }
+      if (!duration) duration = 60;
       if (chargeType === 'per_hour') return baseCharge * (duration / 60);
       if (chargeType === 'per_minute') return baseCharge * duration;
       return baseCharge;
