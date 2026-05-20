@@ -140,7 +140,7 @@ export default function TablesTab({
               <div className="form-group">
                 <label>Booking Charge (NRP)</label>
                 <div className="input-with-currency">
-                  <span className="currency-symbol">Rs.</span>
+                  {/* <span className="currency-symbol">Rs.</span> */}
                   <input
                     type="number"
                     step="0.1"
@@ -163,6 +163,7 @@ export default function TablesTab({
                 </select>
               </div>
             </div>
+            <br></br>
             
             <div className="settings-info-alert info">
               <p>
