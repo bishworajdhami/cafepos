@@ -15,13 +15,6 @@ export default function KitchenDisplay() {
     const [payFirst, setPayFirst] = useState(false);
     const { connection, isConnected, reconnectCount } = useSocket();
 
-    const hasPermission = (perm) => {
-        const permissions = (localStorage.getItem('permissions') || '').split(',');
-        return permissions.includes(perm);
-    };
-
-    const canViewKOT = hasPermission('kitchen.view_kot');
-
     const knownOrderIds = React.useRef(new Set());
     const isInitialLoad = React.useRef(true);
     const audioContextRef = React.useRef(null);
@@ -424,28 +417,24 @@ export default function KitchenDisplay() {
 
                             {/* 3. Items Section */}
                             <div className="order-items-section">
-                                {canViewKOT ? (
-                                    <div className="items-scroll-area">
-                                        {order.items.map((item, idx) => (
-                                            <div key={idx} className="item-row-modern">
-                                                <div className="item-qty-badge">{item.quantity}x</div>
-                                                <div className="item-details-col">
-                                                    <span className="item-name-text">{item.name}</span>
-                                                    {item.specialRequest && (
-                                                        <div className="special-req-text">
-                                                            <FaExclamationTriangle size={8} /> {item.specialRequest}
-                                                        </div>
-                                                    )}
-                                                </div>
+                                <div className="items-scroll-area">
+                                    {order.items.map((item, idx) => (
+                                        <div key={idx} className="item-row-modern">
+                                            <div className="item-qty-badge">{item.quantity}x</div>
+                                            <div className="item-details-col">
+                                                <span className="item-name-text">{item.name}</span>
+                                                {item.price != null && (
+                                                    <div className="item-price-text">NRP {parseFloat(item.price).toFixed(2)}</div>
+                                                )}
+                                                {item.specialRequest && (
+                                                    <div className="special-req-text">
+                                                        <FaExclamationTriangle size={8} /> {item.specialRequest}
+                                                    </div>
+                                                )}
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="permission-denied-kot" style={{ padding: '2rem 1rem', textAlign: 'center', backgroundColor: '#fee2e2', borderRadius: '0', color: '#b91c1c', fontSize: '0.85rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                                        <FaLock style={{ marginBottom: '0.5rem', fontSize: '1.5rem' }} />
-                                        <span>View KOT Permission Required</span>
-                                    </div>
-                                )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* 4. Actions Section */}
