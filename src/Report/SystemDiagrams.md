@@ -7,17 +7,121 @@
 
 ## Table of Contents
 
-1. [Use Case Diagrams](#1-use-case-diagrams)
-2. [Activity Diagrams](#2-activity-diagrams)
-3. [Sequence Diagrams](#3-sequence-diagrams)
-4. [ERD — Entity Relationship Diagrams](#4-erd--entity-relationship-diagrams)
-5. [Class Diagrams](#5-class-diagrams)
+1. [System Overview Diagrams](#1-system-overview-diagrams)
+2. [Use Case Diagrams](#2-use-case-diagrams)
+3. [Activity Diagrams](#3-activity-diagrams)
+4. [Sequence Diagrams](#4-sequence-diagrams)
+5. [ERD — Entity Relationship Diagrams](#5-erd--entity-relationship-diagrams)
+6. [Class Diagrams](#6-class-diagrams)
+7. [Project Management](#7-project-management)
 
 ---
 
-## 1. Use Case Diagrams
+## 1. System Overview Diagrams
 
-### 1.1 — Authentication (All Roles)
+### 1.1 — Functional Decomposition Diagram (FDD)
+
+```mermaid
+---
+title: "Functional Decomposition Diagram — Café Management System"
+---
+%%{init: {"flowchart": {"curve": "step", "nodeSpacing": 80, "rankSpacing": 100}} }%%
+graph TD
+    classDef system   fill:#7c3aed,stroke:#5b21b6,color:#fff,font-weight:bold
+    classDef subsys   fill:#1e40af,stroke:#1d4ed8,color:#fff,font-weight:bold
+    classDef module   fill:#0e7490,stroke:#0891b2,color:#fff
+    classDef support  fill:#059669,stroke:#047857,color:#fff
+
+    CMS["Café Management System"]:::system
+
+    S1["Subsystem 1:<br/>Authentication & User Management"]:::subsys
+    S2["Subsystem 2:<br/>Order, Table & Payment Management"]:::subsys
+    S3["Subsystem 3:<br/>Stock, Reporting & System Configuration"]:::subsys
+
+    A1["User Login & Authentication"]:::module
+    A2["OTP Email Verification"]:::module
+    A3["Password Reset"]:::module
+    A4["Staff Account Management"]:::module
+    A5["Role & Permission Management"]:::module
+
+    O1["Order Management"]:::module
+    O2["Kitchen Display System"]:::module
+    O3["Table Session Management"]:::module
+    O4["Table Booking System"]:::module
+    O5["Payment Processing"]:::module
+    O6["Bill Splitting & Refunds"]:::module
+    O7["Cash Shift Closing"]:::module
+
+    R1["Stock Management"]:::module
+    R2["Business Insights & Reports"]:::module
+    R3["Menu & Category Management"]:::module
+    R4["Discount Engine"]:::module
+    R5["System Settings Configuration"]:::module
+
+    API["ASP.NET Core Web API (C#)"]:::support
+    DB["SQL Server Database"]:::support
+    CACHE["Real-time Communication (SignalR)"]:::support
+    FE["React.js Frontend"]:::support
+
+    CMS --> S1 & S2 & S3
+    S1 --> A1 & A2 & A3 & A4 & A5
+    S2 --> O1 & O2 & O3 & O4 & O5 & O6 & O7
+    S3 --> R1 & R2 & R3 & R4 & R5
+
+    S1 & S2 & S3 --> API
+    API --> DB & CACHE
+    CACHE --> FE
+```
+
+---
+
+### 1.2 — System Architecture Overview
+
+```mermaid
+---
+title: "System Architecture — Café Management System"
+---
+%%{init: {"flowchart": {"curve": "step", "nodeSpacing": 70, "rankSpacing": 100}} }%%
+graph TB
+    classDef frontend fill:#ec4899,stroke:#be185d,color:#fff,font-weight:bold
+    classDef api      fill:#3b82f6,stroke:#1d4ed8,color:#fff,font-weight:bold
+    classDef service  fill:#10b981,stroke:#059669,color:#fff,font-weight:bold
+    classDef database fill:#f59e0b,stroke:#d97706,color:#fff,font-weight:bold
+    classDef external fill:#8b5cf6,stroke:#6d28d9,color:#fff,font-weight:bold
+
+    Browser["Web Browser<br/>(Manager/Cashier/Chef/Waiter)"]:::frontend
+
+    React["React.js Frontend<br/>(TypeScript/JSX)<br/>- Routing (react-router)<br/>- State Management (Context)<br/>- HTTP Client (axios)<br/>- SignalR Client (@microsoft/signalr)"]:::frontend
+
+    CORS["CORS Configuration<br/>& JWT Token Handling"]:::api
+
+    API["ASP.NET Core Web API<br/>(C# .NET 6+)<br/>- Controllers (REST endpoints)<br/>- JWT Authentication<br/>- Authorization Middleware<br/>- SignalR Hubs"]:::api
+
+    EFC["Entity Framework Core<br/>(ORM Layer)<br/>- Code-First Migrations<br/>- LINQ Queries<br/>- Change Tracking"]:::service
+
+    SignalR["SignalR Hub<br/>(Real-time Communication)<br/>- Order Updates<br/>- Kitchen Notifications<br/>- Payment Events<br/>- Group Broadcasting"]:::service
+
+    EmailService["Email Service<br/>(SMTP)<br/>- OTP Delivery<br/>- Password Reset Tokens"]:::external
+
+    MSSQL["SQL Server Database<br/>- Users & Roles<br/>- Orders & OrderItems<br/>- Payments & Refunds<br/>- MenuItems & Categories<br/>- Stock & Batches<br/>- TableSessions & Bookings<br/>- CashClosing & Transactions<br/>- Discounts & Settings"]:::database
+
+    Browser <--> |HTTP & WebSocket| React
+    React <--> |AJAX/REST| CORS
+    CORS <--> |Requests/Responses| API
+    API <--> |Connection String| EFC
+    EFC <--> |SQL Queries| MSSQL
+    API <--> |Hub Protocol| SignalR
+    SignalR <--> |Server Push| React
+    API <--> |SMTP| EmailService
+
+    style Browser fill:#f3f4f6,stroke:#9ca3af,color:#1f2937
+```
+
+---
+
+## 2. Use Case Diagrams
+
+### 2.1 — Authentication (All Roles)
 
 ```mermaid
 ---
@@ -51,7 +155,7 @@ flowchart TD
 
 ---
 
-### 1.2 — Manager Use Cases
+### 2.2 — Manager Use Cases
 
 ```mermaid
 ---
@@ -98,7 +202,7 @@ flowchart TD
 
 ---
 
-### 1.3 — Cashier Use Cases
+### 2.3 — Cashier Use Cases
 
 ```mermaid
 ---
@@ -149,7 +253,7 @@ flowchart TD
 
 ---
 
-### 1.4 — Chef & Waiter Use Cases
+### 2.4 — Chef & Waiter Use Cases
 
 ```mermaid
 ---
@@ -184,9 +288,9 @@ flowchart TD
 
 ---
 
-## 2. Activity Diagrams
+## 3. Activity Diagrams
 
-### 2.1 — Authentication Flow
+### 3.1 — Authentication Flow
 
 ```mermaid
 ---
@@ -234,7 +338,7 @@ flowchart TD
 
 ---
 
-### 2.2 — Forgot / Reset Password Flow
+### 3.2 — Forgot / Reset Password Flow
 
 ```mermaid
 ---
@@ -274,7 +378,7 @@ flowchart TD
 
 ---
 
-### 2.3 — Order Creation (Part A)
+### 3.3 — Order Creation (Part A)
 
 ```mermaid
 ---
@@ -321,7 +425,7 @@ flowchart TD
 
 ---
 
-### 2.4 — Kitchen & Payment (Part B)
+### 3.4 — Kitchen & Payment (Part B)
 
 ```mermaid
 ---
@@ -370,7 +474,7 @@ flowchart TD
 
 ---
 
-### 2.5 — Cash Closing (Shift End)
+### 3.5 — Cash Closing (Shift End)
 
 ```mermaid
 ---
@@ -407,9 +511,9 @@ flowchart TD
 
 ---
 
-## 3. Sequence Diagrams
+## 4. Sequence Diagrams
 
-### 3.1 — Login & Authentication
+### 4.1 — Login & Authentication
 
 ```mermaid
 ---
@@ -445,7 +549,7 @@ sequenceDiagram
 
 ---
 
-### 3.2 — Cashier Places an Order
+### 4.2 — Cashier Places an Order
 
 ```mermaid
 ---
@@ -476,7 +580,7 @@ sequenceDiagram
 
 ---
 
-### 3.3 — Kitchen Status Update
+### 4.3 — Kitchen Status Update
 
 ```mermaid
 ---
@@ -505,7 +609,7 @@ sequenceDiagram
 
 ---
 
-### 3.4 — Payment Processing
+### 4.4 — Payment Processing
 
 ```mermaid
 ---
@@ -539,7 +643,7 @@ sequenceDiagram
 
 ---
 
-### 3.5 — Table Booking Flow
+### 4.5 — Table Booking Flow
 
 ```mermaid
 ---
@@ -567,9 +671,9 @@ sequenceDiagram
 
 ---
 
-## 4. ERD — Entity Relationship Diagrams
+## 5. ERD — Entity Relationship Diagrams
 
-### 4.1 — Users & Authentication
+### 5.1 — Users & Authentication
 
 ```mermaid
 ---
@@ -600,7 +704,7 @@ erDiagram
 
 ---
 
-### 4.2 — Orders & Payments
+### 5.2 — Orders & Payments
 
 ```mermaid
 ---
@@ -676,7 +780,7 @@ erDiagram
 
 ---
 
-### 4.3 — Menu & Discounts
+### 5.3 — Menu & Discounts
 
 ```mermaid
 ---
@@ -724,7 +828,7 @@ erDiagram
 
 ---
 
-### 4.4 — Tables, Sessions & Bookings
+### 5.4 — Tables, Sessions & Bookings
 
 ```mermaid
 ---
@@ -784,7 +888,7 @@ erDiagram
 
 ---
 
-### 4.5 — Stock & Cash Management
+### 5.5 — Stock & Cash Management
 
 ```mermaid
 ---
@@ -847,9 +951,9 @@ erDiagram
 
 ---
 
-## 5. Class Diagrams
+## 6. Class Diagrams
 
-### 5.1 — User Role Hierarchy
+### 6.1 — User Role Hierarchy
 
 ```mermaid
 ---
@@ -909,7 +1013,7 @@ classDiagram
 
 ---
 
-### 5.2 — Order & Payment Classes
+### 6.2 — Order & Payment Classes
 
 ```mermaid
 ---
@@ -985,7 +1089,7 @@ classDiagram
 
 ---
 
-### 5.3 — Menu, Category & Discount Classes
+### 6.3 — Menu, Category & Discount Classes
 
 ```mermaid
 ---
@@ -1032,7 +1136,7 @@ classDiagram
 
 ---
 
-### 5.4 — Table Session & Booking Classes
+### 6.4 — Table Session & Booking Classes
 
 ```mermaid
 ---
@@ -1090,7 +1194,7 @@ classDiagram
 
 ---
 
-### 5.5 — Stock & Cash Classes
+### 6.5 — Stock & Cash Classes
 
 ```mermaid
 ---
@@ -1161,6 +1265,84 @@ classDiagram
 
     StockItem "1" --> "many" StockBatch
     StockItem "1" --> "many" StockTransaction
+```
+
+---
+
+## 7. Project Management
+
+### 7.1 — Development Timeline (Gantt Chart)
+
+```mermaid
+---
+title: "Gantt Chart — Café Management System Development (Sprint Schedule)"
+---
+gantt
+    title Project Timeline — 17 Weeks
+    dateFormat YYYY-MM-DD
+    
+    section Planning & Setup
+    Project Setup & Planning :setup, 2025-01-06, 14d
+    Database Schema Design :dbdesign, 2025-01-06, 21d
+    Architecture & Tech Stack :arch, 2025-01-13, 14d
+    
+    section Sprint 1
+    Sprint 1: Auth & User Mgmt :sprint1, 2025-01-20, 21d
+    - API Endpoints Dev :s1api, 2025-01-20, 14d
+    - JWT & Auth Flow :s1jwt, 2025-01-22, 12d
+    - OTP Email System :s1otp, 2025-01-27, 9d
+    - React Login UI :s1ui, 2025-01-20, 14d
+    - Integration Testing :s1test, 2025-02-03, 5d
+    
+    section Sprint 2
+    Sprint 2: Orders & Kitchen :sprint2, 2025-02-10, 21d
+    - Menu API Dev :s2menu, 2025-02-10, 10d
+    - Order Creation API :s2order, 2025-02-12, 12d
+    - SignalR Hub Setup :s2signal, 2025-02-17, 9d
+    - Kitchen UI :s2kdsui, 2025-02-10, 14d
+    - Real-time Testing :s2test, 2025-02-24, 5d
+    
+    section Sprint 3
+    Sprint 3: Tables & Payments :sprint3, 2025-03-03, 21d
+    - Table Session API :s3table, 2025-03-03, 12d
+    - Booking System :s3book, 2025-03-10, 10d
+    - Payment Processing :s3payment, 2025-03-12, 12d
+    - Refund Flows :s3refund, 2025-03-17, 10d
+    - UI Integration :s3ui, 2025-03-03, 14d
+    - Concurrent Testing :s3test, 2025-03-17, 5d
+    
+    section Sprint 4
+    Sprint 4: Reporting & Cash :sprint4, 2025-03-24, 21d
+    - Cash Closing Module :s4cash, 2025-03-24, 12d
+    - Business Insights API :s4insights, 2025-03-31, 12d
+    - Discount Engine :s4discount, 2025-03-28, 10d
+    - Manager Dashboard :s4manager, 2025-03-24, 14d
+    - Report Testing :s4test, 2025-04-07, 5d
+    
+    section Sprint 5
+    Sprint 5: Stock & Polish :sprint5, 2025-04-14, 21d
+    - Stock Management API :s5stock, 2025-04-14, 12d
+    - Batch & Expiry Tracking :s5batch, 2025-04-21, 10d
+    - Stock Decay Simulation :s5decay, 2025-04-24, 8d
+    - System Settings :s5settings, 2025-04-28, 7d
+    - UI Polish & UX :s5ui, 2025-04-14, 14d
+    - UAT Testing :s5test, 2025-04-28, 7d
+    
+    section Sprint 6
+    Sprint 6: Finalization :sprint6, 2025-05-05, 14d
+    - Bug Fixes & QA :s6bugs, 2025-05-05, 7d
+    - Performance Optimization :s6perf, 2025-05-08, 5d
+    - Deployment Config (Azure) :s6deploy, 2025-05-10, 5d
+    - Documentation :s6docs, 2025-05-05, 10d
+    - Final Testing & Sign-off :s6final, 2025-05-12, 7d
+    
+    section Milestones
+    Sprint 1 Complete :crit, ms1, 2025-02-10, 1d
+    Sprint 2 Complete :crit, ms2, 2025-03-03, 1d
+    Sprint 3 Complete :crit, ms3, 2025-03-24, 1d
+    Sprint 4 Complete :crit, ms4, 2025-04-14, 1d
+    Sprint 5 Complete :crit, ms5, 2025-05-05, 1d
+    Project Completion :crit, ms6, 2025-05-19, 1d
 ```
 
 ---

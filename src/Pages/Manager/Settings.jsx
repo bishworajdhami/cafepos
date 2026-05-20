@@ -497,8 +497,7 @@ export default function Settings() {
     { id: 'tables', title: 'Table Management', icon: <FaTable />, desc: 'Configure floors, tables, and seats' },
     { id: 'cashBalance', title: 'Cash Drawer', icon: <FaMoneyBillWave />, desc: 'Manage cash balances and adjustments' },
 
-    { id: 'paymentMethods', title: 'QR Payment Setup', icon: <FaMobileAlt />, desc: 'Mobile payment options and QR codes' },
-    { id: 'dataManagement', title: 'Data Management', icon: <FaTrash />, desc: 'Dangerous operations like data clearing' }
+    { id: 'paymentMethods', title: 'QR Payment Setup', icon: <FaMobileAlt />, desc: 'Mobile payment options and QR codes' }
   ];
 
   return (

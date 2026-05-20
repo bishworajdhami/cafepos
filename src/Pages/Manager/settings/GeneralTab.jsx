@@ -160,21 +160,7 @@ export default function GeneralTab({
           </div>
         </div>
 
-        <div className="settings-panel">
-          <div className="settings-panel-header">
-            <h3>Operational Workflow</h3>
-            <p>Configure cashier checkout behavior</p>
-          </div>
-          <div className="settings-panel-content">
-            <label className="settings-toggle-row premium">
-              <div className="toggle-info">
-                <span className="toggle-label">Pay First Mode</span>
-                <p className="toggle-desc">Customer pays before the order is served</p>
-              </div>
-              <input type="checkbox" className="settings-toggle-switch" checked={payFirst} onChange={e => setPayFirst(e.target.checked)} />
-            </label>
-          </div>
-        </div>
+
       </div>
     </div>
   );

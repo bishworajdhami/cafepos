@@ -679,49 +679,49 @@ export default function OrderTaking() {
 
         {/* Booking Buttons (only when no active booking on selected table) */}
         {!activeBooking && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem', marginBottom: '0.5rem' }}>
             {/* Named Booking */}
             <button
               onClick={() => { setModalError(''); setShowBookingModal(true); }}
               className="btn-create-booking"
               style={{
-                width: '100%',
-                padding: '0.65rem 0.75rem',
+                flex: 1,
+                padding: '0.45rem 0.5rem',
                 backgroundColor: 'var(--color-primary)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '0.5rem',
                 fontWeight: '600',
-                fontSize: '0.875rem',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.5rem',
+                gap: '0.35rem',
               }}
             >
-              <FaGift /> Book with Name &amp; Number
+              <FaGift /> Named Booking
             </button>
             {/* Quick Walk-in */}
             <button
               onClick={() => { setModalError(''); setShowQuickBookingModal(true); }}
               style={{
-                width: '100%',
-                padding: '0.65rem 0.75rem',
+                flex: 1,
+                padding: '0.45rem 0.5rem',
                 backgroundColor: 'var(--color-surface)',
                 color: 'var(--color-primary)',
                 border: '1.5px solid var(--color-primary)',
                 borderRadius: '0.5rem',
                 fontWeight: '600',
-                fontSize: '0.875rem',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '0.5rem',
+                gap: '0.35rem',
               }}
             >
-              <FaUtensils /> Quick Walk-in (No Name)
+              <FaUtensils /> Quick Walk-in
             </button>
           </div>
         )}
