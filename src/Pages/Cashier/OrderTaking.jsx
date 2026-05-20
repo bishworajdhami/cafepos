@@ -775,14 +775,13 @@ export default function OrderTaking() {
         {/* Active Booking Alert & Link Logic */}
         {activeBooking && (
           <div style={{ display: 'grid', gap: '0.5rem' }}>
-            <div className={`booking-alert-compact ${linkedBookingId === activeBooking.id ? 'linked' : ''}`}>
-              <div className="booking-alert-header">
-                <span className="booking-customer-name">
-                  <FaShoppingBag style={{ fontSize: '0.8rem' }} /> {activeBooking.customerName}
-                </span>
-                {linkedBookingId === activeBooking.id ? (
-                  <span className="linked-badge"><FaCheck /> Linked</span>
-                ) : (
+            {/* Don't render the compact booking alert when it's already linked */}
+            {linkedBookingId !== activeBooking.id && (
+              <div className={`booking-alert-compact`}>
+                <div className="booking-alert-header">
+                  <span className="booking-customer-name">
+                    <FaShoppingBag style={{ fontSize: '0.8rem' }} /> {activeBooking.customerName}
+                  </span>
                   <button
                     className="link-booking-btn-small"
                     onClick={() => {
@@ -794,19 +793,9 @@ export default function OrderTaking() {
                   >
                     Link
                   </button>
-                )}
-              </div>
-
-              {linkedBookingId === activeBooking.id && (
-                <div className="booking-charge-mini-row">
-                  <span>Booking Charge: NRP {calculateBookingCharge().toFixed(2)}</span>
-                  <button className="unlink-btn-small" onClick={() => {
-                    setLinkedBookingId(null);
-                    setApplyBookingCharge(false);
-                  }}>Unlink</button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {linkedBookingId === activeBooking.id && settings.tableBookingCharge > 0 && (
               <div className="booking-charge-status">
