@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FaCog, FaCogs, FaExclamationTriangle, FaCheck, FaMobileAlt, FaMoneyBillWave, FaArrowLeft, FaTable, FaSave, FaTrash } from 'react-icons/fa';
+import { FaCog, FaCogs, FaExclamationTriangle, FaCheck, FaMobileAlt, FaMoneyBillWave, FaArrowLeft, FaTable, FaSave } from 'react-icons/fa';
 import { getJson, putJson, postJson, uploadFile, getImageUrl } from '../../utils/api';
 import { useSocket } from '../../SocketContext';
 import './Settings.css';
