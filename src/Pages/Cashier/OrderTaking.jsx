@@ -211,7 +211,8 @@ export default function OrderTaking() {
       setCurrentTable('');
       setSelectedSeats([]);
     }
-  }, [searchParams, selectedSeats.length]); // Watching both URL and local seat count for reliable syncing
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]); // removed selectedSeats.length to prevent clearing state during walk-in selection
 
   const checkActiveBooking = useCallback(async () => {
     try {
@@ -682,7 +683,7 @@ export default function OrderTaking() {
           <div style={{ display: 'flex', flexDirection: 'row', gap: '0.5rem', marginBottom: '0.5rem' }}>
             {/* Named Booking */}
             <button
-              onClick={() => { setModalError(''); setShowBookingModal(true); }}
+              onClick={(e) => { e.stopPropagation(); setModalError(''); setShowBookingModal(true); }}
               className="btn-create-booking"
               style={{
                 flex: 1,
@@ -704,7 +705,7 @@ export default function OrderTaking() {
             </button>
             {/* Quick Walk-in */}
             <button
-              onClick={() => { setModalError(''); setShowQuickBookingModal(true); }}
+              onClick={(e) => { e.stopPropagation(); setModalError(''); setShowQuickBookingModal(true); }}
               style={{
                 flex: 1,
                 padding: '0.45rem 0.5rem',
@@ -737,7 +738,8 @@ export default function OrderTaking() {
               <span><FaUtensils style={{ marginRight: '0.4rem', color: 'var(--color-primary)' }} />{selectedFloorName} — Table {currentTable}</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setCurrentTable('');
                     setSelectedFloorName('');
                     setSelectedSeats([]);

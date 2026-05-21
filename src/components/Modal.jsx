@@ -36,7 +36,7 @@ const Modal = ({
                     <button className="modal-close" onClick={onCancel}>&times;</button>
                 </div>
                 <div className="modal-body">
-                    <p>{message}</p>
+                    {React.isValidElement(message) ? message : <p>{message}</p>}
                     {showInput && (
                         <div className="modal-input-container">
                             <input
