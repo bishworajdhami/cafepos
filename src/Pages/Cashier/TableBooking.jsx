@@ -1230,7 +1230,7 @@ export default function TableBooking() {
                                     </button>
                                 )}
 
-                                {(selectedTableAction.status === 'active' || selectedTableAction.status === 'upcoming') && (
+                                {(selectedTableAction.status === 'active' || selectedTableAction.status === 'upcoming') && !selectedTableAction.orderId && (
                                     <button
                                         className="tb-action-card tb-action-danger"
                                         onClick={(e) => {
