@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { FaGift, FaTimes, FaToggleOn, FaToggleOff, FaThLarge, FaList, FaUtensils, FaPlus, FaTrash, FaLayerGroup, FaPlusSquare, FaEdit, FaSearch, FaCheck, FaSpinner } from 'react-icons/fa';
+import { FaGift, FaTimes, FaToggleOn, FaToggleOff, FaThLarge, FaList, FaUtensils, FaPlus, FaTrash, FaLayerGroup, FaPlusSquare, FaEdit, FaSearch, FaCheck, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 
 import { getJson, putJson, postJson, deleteJson } from '../../utils/api';
 import Modal from '../../components/Modal';
@@ -18,7 +18,7 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
   const [viewMode, setViewMode] = useState('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 24; // Increased for a larger grid
+  const ITEMS_PER_PAGE = 24;
 
   // Modal State
   const [confirmModal, setConfirmModal] = useState({
@@ -104,7 +104,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
       }
     } catch (err) {
       console.error('Failed to load settings:', err);
-      // Use defaults if API fails
     }
   }
 
@@ -128,24 +127,19 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
     }
   }
 
-  // Calculate discounted price for a menu item
   function getDiscountedPrice(item) {
     const now = new Date();
 
-    // Find active individual discounts for this item (not combo offers)
     const activeDiscounts = discounts.filter(discount => {
       if (!discount.active) return false;
-      if (discount.offerType === 'combo') return false; // Skip combo offers
+      if (discount.offerType === 'combo') return false;
       if (discount.startDate && new Date(discount.startDate) > now) return false;
       if (discount.endDate && new Date(discount.endDate) < now) return false;
-
-      // Check if this item is in the discount's menu items
       return discount.menuItems?.some(menuItem => menuItem.id === item.id);
     });
 
     if (activeDiscounts.length === 0) return null;
 
-    // Apply the first active discount (or you could apply all and take the best one)
     const discount = activeDiscounts[0];
     const itemPrice = parseFloat(item.price);
 
@@ -161,7 +155,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
   function handleEdit(item) {
     setEditingItem(item);
 
-    // Check for active individual discount for this item
     const activeDiscount = discounts.find(d =>
       d.active &&
       d.offerType === 'individual' &&
@@ -213,7 +206,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
     e.preventDefault();
     setError('');
 
-    // Validate inputs
     if (parseFloat(formData.price) < 0) {
       setError('Price cannot be negative');
       return;
@@ -222,8 +214,18 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
       setError('Please enter a discount value');
       return;
     }
-    if (formData.hasDiscount && (parseFloat(formData.discountValue) < 0)) {
+    if (formData.hasDiscount && parseFloat(formData.discountValue) < 0) {
       setError('Discount value cannot be negative');
+      return;
+    }
+    // Validate percentage discount does not exceed 100%
+    if (formData.hasDiscount && formData.discountType === 'percentage' && parseFloat(formData.discountValue) > 100) {
+      setError('Percentage discount cannot exceed 100%');
+      return;
+    }
+    // Validate fixed discount does not exceed or equal item price
+    if (formData.hasDiscount && formData.discountType === 'fixed' && parseFloat(formData.discountValue) >= parseFloat(formData.price)) {
+      setError('Fixed discount cannot be greater than or equal to the item price');
       return;
     }
 
@@ -239,19 +241,14 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
 
       let savedItemId;
 
-      // 1. Save Menu Item
       if (editingItem) {
-        // Update existing item
         await putJson(`/api/manager/menu/${editingItem.id}`, requestData);
         savedItemId = editingItem.id;
       } else {
-        // Create new item
         const newItem = await postJson('/api/manager/menu', requestData);
-        // Handle different response formats (some APIs return the item, some return a wrapper)
         savedItemId = newItem?.id || newItem?.Id || newItem?.Item?.id || newItem?.value?.id;
 
         if (!savedItemId) {
-          // Fallback: If server doesn't return ID (common in some legacy APIs), fetch all items to find the new one
           console.log('New item ID not returned. Fetching list to find it...');
           const freshItems = await getJson('/api/manager/menu');
           const match = freshItems.find(i => i.name === requestData.name);
@@ -265,7 +262,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
         }
       }
 
-      // 2. Handle Discount
       if (formData.hasDiscount && formData.discountValue) {
         const discountData = {
           name: `${formData.name} Discount`,
@@ -280,15 +276,11 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
         };
 
         if (originalDiscountId) {
-          // Update existing discount
           await putJson(`/api/manager/discounts/${originalDiscountId}`, discountData);
         } else {
-          // Create new discount
-          // First check (backend will also check) but good to try-catch specifically if we want
           await postJson('/api/manager/discounts', discountData);
         }
       } else if (originalDiscountId && !formData.hasDiscount) {
-        // Deactivate existing discount if checkbox unchecked
         await putJson(`/api/manager/discounts/${originalDiscountId}/toggle`, {});
       }
 
@@ -316,8 +308,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
 
     } catch (err) {
       console.error('Failed to save item or discount:', err);
-      // If menu item was saved but discount failed, we might want to warn user, 
-      // but for now just show the error.
       setError(err.message || 'Failed to save item');
     } finally {
       setLoading(false);
@@ -359,13 +349,13 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
   async function handleCategoryUpdate(id, newName) {
     await putJson(`/api/manager/categories/${id}`, { name: newName });
     await loadCategories();
-    await loadMenuItems(); // category rename cascades to menu items
+    await loadMenuItems();
   }
 
   async function handleCategoryDelete(id) {
     await deleteJson(`/api/manager/categories/${id}`);
     await loadCategories();
-    await loadMenuItems(); // deleted category nullifies menu item categories
+    await loadMenuItems();
   }
 
   function cancelForm() {
@@ -388,9 +378,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
     setError('');
   }
 
-
-
-
   const filteredItems = menuItems.filter(item =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (item.category && item.category.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -398,7 +385,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
 
   const resetPage = () => setCurrentPage(1);
 
-  // Prepare items based on active category
   let displayItems = [];
   if (activeCategory === 'All') {
     displayItems = [...filteredItems].sort((a, b) => a.name.localeCompare(b.name));
@@ -409,7 +395,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
   const totalPages = Math.ceil(displayItems.length / ITEMS_PER_PAGE);
   const pagedItems = displayItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  // Get active combo offers
   const now = new Date();
   const activeComboOffers = discounts.filter(discount => {
     if (!discount.active || discount.offerType !== 'combo') return false;
@@ -418,7 +403,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
     return true;
   });
 
-  // Calculate combo offer pricing
   function getComboPrice(combo) {
     const originalTotal = combo.menuItems?.reduce((sum, item) => sum + parseFloat(item.price), 0) || 0;
     if (combo.discountType === 'percentage') {
@@ -441,8 +425,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
     });
   };
 
-
-
   return (
     <div className="mm-container">
       <header className="standard-page-header">
@@ -457,7 +439,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
         </div>
       </header>
 
-      {/* Only show page-level banners when no modal is open */}
       {error && !showForm && !showBulkForm && <div className="mm-error-message">{error}</div>}
       {success && <div className="mm-error-message" style={{ backgroundColor: '#d1fae5', color: '#065f46', borderColor: '#34d399' }}>✓ {success}</div>}
 
@@ -558,7 +539,7 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
                 </div>
               </div>
             </div>
-            {/* Category chips */}
+
             <div className="mm-category-chips">
               <button
                 className={`mm-chip ${activeCategory === 'All' ? 'active' : ''}`}
@@ -584,7 +565,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
             </div>
           ) : (
             <div className="mm-categories-list">
-              {/* 1. Integrated Combo Offers (at the top) - Hidden in Chef View */}
               {!isChefView && (() => {
                 const relevantCombos = activeCategory === 'All'
                   ? activeComboOffers
@@ -593,17 +573,16 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
                 if (relevantCombos.length > 0) {
                   return (
                     <div className="mm-category-section mm-combo-section" style={{ marginBottom: '2.5rem' }}>
-
                       <div className={`mm-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
                         {relevantCombos.map(combo => {
                           const originalPrice = getComboOriginalPrice(combo);
                           const comboPrice = getComboPrice(combo);
                           const savings = originalPrice - comboPrice;
                           const isAvail = isComboAvailable(combo);
-                          
+
                           return (
-                            <div 
-                              key={combo.id} 
+                            <div
+                              key={combo.id}
                               className={`mm-card mm-combo-card ${!isAvail ? 'unavailable' : ''}`}
                               onClick={() => !isChefView && onTabChange && onTabChange('discount')}
                               style={!isAvail ? { opacity: 0.7, filter: 'grayscale(100%)' } : {}}
@@ -627,8 +606,8 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
                                     const fullItem = menuItems.find(m => m.id === item.id);
                                     const itemAvail = fullItem ? fullItem.isAvailable : false;
                                     return (
-                                      <span 
-                                        key={item.id} 
+                                      <span
+                                        key={item.id}
                                         className="mm-combo-item-tag"
                                         style={!itemAvail ? { textDecoration: 'line-through', opacity: 0.6 } : {}}
                                       >
@@ -659,7 +638,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
                 return null;
               })()}
 
-              {/* 2. Standard Items (Flat or Category Filtered) */}
               <div className="mm-category-section">
                 <div className={`mm-grid ${viewMode === 'list' ? 'list-view' : ''}`}>
                   {pagedItems.map(item => {
@@ -710,7 +688,6 @@ export default function MenuManagement({ isChefView = false, onTabChange }) {
                 </div>
               </div>
 
-              {/* Pagination Controls (inside categories-list but after all items) */}
               {totalPages > 1 && (
                 <div className="mm-pagination">
                   <button
@@ -770,6 +747,39 @@ function MenuItemFormModal({
   onSubmit,
   isChefView
 }) {
+  // Derive live inline discount warnings
+  const itemPrice = parseFloat(formData.price);
+  const discountVal = parseFloat(formData.discountValue);
+
+  const discountWarning = (() => {
+    if (!formData.hasDiscount || !formData.discountValue || isNaN(discountVal)) return null;
+
+    if (formData.discountType === 'percentage') {
+      if (discountVal > 100) {
+        return 'Percentage discount cannot exceed 100%.';
+      }
+      if (discountVal === 100) {
+        return 'A 100% discount makes the item free. Are you sure?';
+      }
+    }
+
+    if (formData.discountType === 'fixed') {
+      if (!isNaN(itemPrice) && itemPrice > 0 && discountVal >= itemPrice) {
+        return `Fixed discount (NRP ${discountVal.toFixed(2)}) cannot be greater than or equal to the item price (NRP ${itemPrice.toFixed(2)}).`;
+      }
+    }
+
+    return null;
+  })();
+
+  // True blocking errors (prevent submit)
+  const hasBlockingDiscountError = (() => {
+    if (!formData.hasDiscount || !formData.discountValue || isNaN(discountVal)) return false;
+    if (formData.discountType === 'percentage' && discountVal > 100) return true;
+    if (formData.discountType === 'fixed' && !isNaN(itemPrice) && itemPrice > 0 && discountVal >= itemPrice) return true;
+    return false;
+  })();
+
   return ReactDOM.createPortal(
     <div className="mm-modal-overlay" onClick={(e) => {
       if (e.target === e.currentTarget) onCancel();
@@ -789,6 +799,7 @@ function MenuItemFormModal({
             {error && (
               <div className="mm-modal-alert mm-modal-alert--error">{error}</div>
             )}
+
             <div className="mm-form-group">
               <label>Item Name *</label>
               <input
@@ -877,7 +888,7 @@ function MenuItemFormModal({
                         <label>Type</label>
                         <select
                           value={formData.discountType}
-                          onChange={e => setFormData({ ...formData, discountType: e.target.value })}
+                          onChange={e => setFormData({ ...formData, discountType: e.target.value, discountValue: '' })}
                         >
                           <option value="percentage">Percentage (%)</option>
                           <option value="fixed">Fixed Amount (NRP)</option>
@@ -888,13 +899,39 @@ function MenuItemFormModal({
                         <input
                           type="number"
                           min="0"
+                          max={formData.discountType === 'percentage' ? 100 : undefined}
                           step={formData.discountType === 'percentage' ? '1' : '0.01'}
                           required={formData.hasDiscount}
                           value={formData.discountValue}
                           onChange={e => setFormData({ ...formData, discountValue: e.target.value })}
                           placeholder={formData.discountType === 'percentage' ? '10' : '100'}
+                          style={hasBlockingDiscountError ? { borderColor: '#ef4444' } : {}}
                         />
                       </div>
+                    </div>
+                  )}
+
+                  {/* Inline discount warning / error shown directly in the modal */}
+                  {formData.hasDiscount && discountWarning && (
+                    <div
+                      className="mm-modal-alert"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '0.5rem',
+                        backgroundColor: hasBlockingDiscountError ? '#fef2f2' : '#fffbeb',
+                        color: hasBlockingDiscountError ? '#b91c1c' : '#92400e',
+                        borderColor: hasBlockingDiscountError ? '#fca5a5' : '#fcd34d',
+                        border: '1px solid',
+                        borderRadius: '6px',
+                        padding: '0.65rem 0.85rem',
+                        fontSize: '0.825rem',
+                        marginTop: '0.25rem',
+                        marginBottom: '0.5rem',
+                      }}
+                    >
+                      <FaExclamationTriangle style={{ marginTop: '2px', flexShrink: 0 }} />
+                      <span>{discountWarning}</span>
                     </div>
                   )}
 
@@ -927,7 +964,11 @@ function MenuItemFormModal({
             <button type="button" className="mm-btn-secondary" onClick={onCancel}>
               Cancel
             </button>
-            <button type="submit" className="mm-btn-primary" disabled={loading}>
+            <button
+              type="submit"
+              className="mm-btn-primary"
+              disabled={loading || hasBlockingDiscountError}
+            >
               {loading ? 'Saving...' : editingItem ? 'Save Changes' : 'Create Item'}
             </button>
           </div>
@@ -997,7 +1038,6 @@ function ManageCategoriesModal({ categories, menuItems, onCancel, onAdd, onUpdat
   const [modalError, setModalError] = useState('');
   const [modalSuccess, setModalSuccess] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-
 
   function showError(msg) {
     setModalError(msg);
@@ -1105,7 +1145,6 @@ function ManageCategoriesModal({ categories, menuItems, onCancel, onAdd, onUpdat
         </div>
 
         <div className="mm-modal-body">
-          {/* Inline feedback */}
           {modalError && (
             <div className="mm-modal-alert mm-modal-alert--error">{modalError}</div>
           )}
@@ -1113,7 +1152,6 @@ function ManageCategoriesModal({ categories, menuItems, onCancel, onAdd, onUpdat
             <div className="mm-modal-alert mm-modal-alert--success">✓ {modalSuccess}</div>
           )}
 
-          {/* Add new category */}
           <form onSubmit={handleAdd} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
             <input
               type="text"
@@ -1134,7 +1172,6 @@ function ManageCategoriesModal({ categories, menuItems, onCancel, onAdd, onUpdat
             </button>
           </form>
 
-          {/* Existing categories list */}
           <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--color-text-muted, #64748b)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
             Existing Categories ({categories.length})
           </div>
@@ -1376,5 +1413,3 @@ function BulkAddMenuModal({ categories, loading, error, onCancel, onSubmit }) {
     document.body
   );
 }
-
-

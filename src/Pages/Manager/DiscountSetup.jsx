@@ -38,6 +38,7 @@ export default function DiscountSetup() {
   });
 
   const [conflictWarning, setConflictWarning] = useState('');
+  const [discountValueWarning, setDiscountValueWarning] = useState('');
 
 
   useEffect(() => {
@@ -63,6 +64,47 @@ export default function DiscountSetup() {
       conn.off('PaymentUpdate', handleUpdate);
     };
   }, [socketRef]);
+
+  // ── Validate discount value against type & selected items ──────────────────
+  useEffect(() => {
+    const value = parseFloat(formData.value);
+
+    if (!formData.value || isNaN(value) || value <= 0) {
+      setDiscountValueWarning('');
+      return;
+    }
+
+    if (formData.discountType === 'percentage') {
+      if (value > 100) {
+        setDiscountValueWarning('⚠️ Percentage discount cannot exceed 100%.');
+      } else {
+        setDiscountValueWarning('');
+      }
+      return;
+    }
+
+    // Fixed amount — compare against total price of selected items
+    if (formData.discountType === 'fixed') {
+      if (!formData.selectedMenuItems || formData.selectedMenuItems.length === 0) {
+        setDiscountValueWarning('');
+        return;
+      }
+
+      const totalPrice = formData.selectedMenuItems.reduce((sum, id) => {
+        const item = menuItems.find(m => m.id === id);
+        return sum + (item ? parseFloat(item.price) : 0);
+      }, 0);
+
+      if (totalPrice > 0 && value > totalPrice) {
+        setDiscountValueWarning(
+          `⚠️ Fixed discount (NRP ${value.toFixed(2)}) cannot exceed the total price of selected item(s) (NRP ${totalPrice.toFixed(2)}).`
+        );
+      } else {
+        setDiscountValueWarning('');
+      }
+    }
+  }, [formData.value, formData.discountType, formData.selectedMenuItems, menuItems]);
+  // ──────────────────────────────────────────────────────────────────────────
 
   async function loadDiscounts() {
     try {
@@ -106,6 +148,7 @@ export default function DiscountSetup() {
     setShowForm(true);
     setError('');
     setSuccess('');
+    setDiscountValueWarning('');
   }
 
   async function handleDeleteClick(id) {
@@ -164,6 +207,29 @@ export default function DiscountSetup() {
       return;
     }
 
+    const value = parseFloat(formData.value);
+
+    // ── Discount value hard-block validations ───────────────────────────────
+    if (formData.discountType === 'percentage' && value > 100) {
+      setError('Percentage discount cannot exceed 100%.');
+      return;
+    }
+
+    if (formData.discountType === 'fixed') {
+      const totalPrice = formData.selectedMenuItems.reduce((sum, id) => {
+        const item = menuItems.find(m => m.id === id);
+        return sum + (item ? parseFloat(item.price) : 0);
+      }, 0);
+
+      if (totalPrice > 0 && value > totalPrice) {
+        setError(
+          `Fixed discount (NRP ${value.toFixed(2)}) cannot exceed the total price of selected item(s) (NRP ${totalPrice.toFixed(2)}).`
+        );
+        return;
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     try {
       setLoading(true);
 
@@ -190,17 +256,7 @@ export default function DiscountSetup() {
       await loadDiscounts();
       setShowForm(false);
       setEditingDiscount(null);
-      setFormData({
-        name: '',
-        description: '',
-        discountType: 'percentage',
-        offerType: 'individual',
-        value: '',
-        startDate: '',
-        endDate: '',
-        selectedMenuItems: [],
-        active: true,
-      });
+      resetForm();
     } catch (err) {
       console.error('Error saving discount:', err);
       setError(err.message || 'Failed to save discount');
@@ -209,9 +265,7 @@ export default function DiscountSetup() {
     }
   }
 
-  function cancelForm() {
-    setShowForm(false);
-    setEditingDiscount(null);
+  function resetForm() {
     setFormData({
       name: '',
       description: '',
@@ -223,6 +277,14 @@ export default function DiscountSetup() {
       selectedMenuItems: [],
       active: true,
     });
+    setDiscountValueWarning('');
+    setConflictWarning('');
+  }
+
+  function cancelForm() {
+    setShowForm(false);
+    setEditingDiscount(null);
+    resetForm();
     setError('');
     setSuccess('');
   }
@@ -347,6 +409,7 @@ export default function DiscountSetup() {
           setFormData={setFormData}
           error={error}
           conflictWarning={conflictWarning}
+          discountValueWarning={discountValueWarning}
           menuItems={menuItems}
           toggleMenuItem={toggleMenuItem}
           loading={loading}
@@ -484,6 +547,7 @@ function DiscountFormModal({
   setFormData,
   error,
   conflictWarning,
+  discountValueWarning,
   menuItems,
   toggleMenuItem,
   loading,
@@ -515,6 +579,12 @@ function DiscountFormModal({
             {conflictWarning && (
               <div className="ds-alert warning">
                 <span>⚠️</span> <span>{conflictWarning}</span>
+              </div>
+            )}
+
+            {discountValueWarning && (
+              <div className="ds-alert warning">
+                <span>{discountValueWarning}</span>
               </div>
             )}
 
