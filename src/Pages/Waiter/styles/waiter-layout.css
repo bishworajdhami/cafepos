@@ -95,6 +95,7 @@
 }
 
 .wd-waiter-status-pill {
+  display: none;
   font-size: 0.6rem;
   background: var(--color-success-light);
   color: var(--color-success-dark);
