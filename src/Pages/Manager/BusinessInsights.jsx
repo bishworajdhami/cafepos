@@ -242,8 +242,7 @@ export default function BusinessInsights() {
               <div className="insight-content">
                 <span className="insight-label">Total Sales</span>
                 <div className="insight-value-wrapper" title={`NRP ${insights.totalSales.toFixed(2)}`}>
-                  <span className="insight-currency">NRP</span>
-                  <p className="insight-value">{insights.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <span className="insight-currency">NRP</span> <p className="insight-value" style={{ display: 'inline' }}>{insights.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 </div>
                 <p className="insight-card-subtitle">Gross revenue in selected period</p>
               </div>
@@ -285,8 +284,7 @@ export default function BusinessInsights() {
               <div className="insight-content">
                 <span className="insight-label">Avg. Order Value</span>
                 <div className="insight-value-wrapper" title={`NRP ${insights.averageOrderValue.toFixed(2)}`}>
-                  <span className="insight-currency">NRP</span>
-                  <p className="insight-value">{insights.averageOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <span className="insight-currency">NRP</span> <p className="insight-value" style={{ display: 'inline' }}>{insights.averageOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 </div>
                 <p className="insight-card-subtitle">Mean spend per customer</p>
               </div>
@@ -306,7 +304,7 @@ export default function BusinessInsights() {
                     </div>
                     <div className="item-stats">
                       <span className="item-quantity">{item.quantity.toLocaleString()} sold</span>
-                      <span className="item-revenue">NRP {item.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      <span className="item-revenue" style={{ whiteSpace: 'nowrap' }}>NRP {item.revenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                     </div>
                   </div>
                 ))}
@@ -339,9 +337,7 @@ export default function BusinessInsights() {
               <p className="card-subtitle">Revenue and count of reservations</p>
               <div className="booking-overview-content">
                 <div className="booking-main-stat">
-                  <span className="booking-stat-value">
-                    NRP {(insights.bookingStats?.totalRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </span>
+                  <span className="booking-stat-value" style={{ whiteSpace: 'nowrap' }}>NRP {(insights.bookingStats?.totalRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   <span className="booking-subtext">Total Booking Revenue</span>
                 </div>
 
@@ -370,7 +366,7 @@ export default function BusinessInsights() {
                           style={{ width: `${(cat.revenue / maxVal) * 100}%` }}
                         />
                       </div>
-                      <span className="category-revenue">NRP {cat.revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                      <span className="category-revenue" style={{ whiteSpace: 'nowrap' }}>NRP {cat.revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     </div>
                   );
                 })}
@@ -392,7 +388,7 @@ export default function BusinessInsights() {
                     <div key={index} className="payment-stat-item">
                       <div className="payment-label">
                         <span>{method.method}</span>
-                        <span>{percent.toFixed(1)}% (NRP {method.total.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
+                        <span style={{ whiteSpace: 'nowrap' }}>{percent.toFixed(1)}% (NRP {method.total.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
                       </div>
                       <div className="payment-progress-bg">
                         <div
@@ -466,7 +462,7 @@ export default function BusinessInsights() {
                         />
                       </div>
                       <span className="sales-day">{day.day}</span>
-                      <span className="sales-amount">NRP {day.sales.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                      <span className="sales-amount" style={{ whiteSpace: 'nowrap' }}>NRP {day.sales.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                     </div>
                   ));
                 })()
@@ -504,7 +500,7 @@ export default function BusinessInsights() {
                           />
                         </div>
                         <span className="sales-day">{d.label}</span>
-                        <span className="sales-amount">Rs. {Number(d.amount).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                        <span className="sales-amount" style={{ whiteSpace: 'nowrap' }}>Rs. {Number(d.amount).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </div>
                     ))}
                   </div>
@@ -542,7 +538,7 @@ export default function BusinessInsights() {
                             }}
                           />
                         </div>
-                        <span className="category-revenue" style={{ color: colors[idx % colors.length] }}>
+                        <span className="category-revenue" style={{ color: colors[idx % colors.length], whiteSpace: 'nowrap' }}>
                           Rs. {Number(r.estimatedValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                         </span>
                       </div>
@@ -573,7 +569,7 @@ export default function BusinessInsights() {
                     <div className="item-bar-wrap">
                       <div className="item-bar bar-sales" style={{ width: `${insights.drawerData.cashSales > 0 ? 100 : 0}%` }} />
                     </div>
-                    <div className="item-value value-sales">NRP {(insights.drawerData.cashSales || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    <div className="item-value value-sales" style={{ whiteSpace: 'nowrap' }}>NRP {(insights.drawerData.cashSales || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                   </div>
 
                   {/* Manager Added */}
@@ -587,7 +583,7 @@ export default function BusinessInsights() {
                         width: `${insights.drawerData.cashSales > 0 ? (insights.drawerData.managerAdded / insights.drawerData.cashSales) * 100 : (insights.drawerData.managerAdded > 0 ? 100 : 0)}%`
                       }} />
                     </div>
-                    <div className="item-value value-added">+ NRP {(insights.drawerData.managerAdded || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    <div className="item-value value-added" style={{ whiteSpace: 'nowrap' }}>+ NRP {(insights.drawerData.managerAdded || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                   </div>
 
                   {/* Manager Removed */}
@@ -601,12 +597,12 @@ export default function BusinessInsights() {
                         width: `${insights.drawerData.cashSales > 0 ? (insights.drawerData.managerRemoved / insights.drawerData.cashSales) * 100 : (insights.drawerData.managerRemoved > 0 ? 100 : 0)}%`
                       }} />
                     </div>
-                    <div className="item-value value-removed">− NRP {(insights.drawerData.managerRemoved || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                    <div className="item-value value-removed" style={{ whiteSpace: 'nowrap' }}>− NRP {(insights.drawerData.managerRemoved || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                   </div>
 
                   <div className="cash-movement-footer">
                     <span className="footer-label">Net Cash Movement</span>
-                    <span className={`footer-value ${((insights.drawerData.cashSales || 0) + (insights.drawerData.managerAdded || 0) - (insights.drawerData.managerRemoved || 0)) >= 0 ? 'pos' : 'neg'}`}>
+                    <span className={`footer-value ${((insights.drawerData.cashSales || 0) + (insights.drawerData.managerAdded || 0) - (insights.drawerData.managerRemoved || 0)) >= 0 ? 'pos' : 'neg'}`} style={{ whiteSpace: 'nowrap' }}>
                       NRP {((insights.drawerData.cashSales || 0) + (insights.drawerData.managerAdded || 0) - (insights.drawerData.managerRemoved || 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </span>
                   </div>
@@ -621,24 +617,24 @@ export default function BusinessInsights() {
                 <div className="drawer-balance-stats">
                   <div className="balance-card opening">
                     <span className="balance-label">Opening Cash</span>
-                    <span className="balance-value">NRP {(insights.drawerData.openingCash || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span className="balance-value" style={{ whiteSpace: 'nowrap' }}>NRP {(insights.drawerData.openingCash || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
 
                   <div className="balance-card expected">
                     <span className="balance-label">Expected in Drawer</span>
-                    <span className="balance-value">NRP {(insights.drawerData.expectedCash || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    <span className="balance-value" style={{ whiteSpace: 'nowrap' }}>NRP {(insights.drawerData.expectedCash || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                   </div>
 
                   {insights.drawerData.closed ? (
                     <>
                       <div className="balance-card actual">
                         <span className="balance-label">Actual Cash Counted</span>
-                        <span className="balance-value">NRP {(insights.drawerData.cashInDrawer || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                        <span className="balance-value" style={{ whiteSpace: 'nowrap' }}>NRP {(insights.drawerData.cashInDrawer || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </div>
 
                       <div className={`balance-card difference ${insights.drawerData.difference >= 0 ? 'positive' : 'negative'}`}>
                         <span className="balance-label">Difference</span>
-                        <span className="balance-value">
+                        <span className="balance-value" style={{ whiteSpace: 'nowrap' }}>
                           {insights.drawerData.difference >= 0 ? '+' : ''}NRP {(insights.drawerData.difference || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </span>
                       </div>
