@@ -259,6 +259,50 @@
   display: block;
 }
 
+/* Inline permissions in create form */
+.sp-form-permissions {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+.sp-form-permissions-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.sp-form-permissions-hint {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+.sp-form-permissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .sp-info-box {
   background: var(--color-primary-light);
   padding: 1rem;
@@ -396,12 +440,12 @@ input:checked + .sp-toggle-slider:before {
 }
 
 .staff-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
@@ -414,21 +458,21 @@ input:checked + .sp-toggle-slider:before {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 4px;
+  bottom: 0;
+  width: 4px;
   background: var(--color-primary);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
+  opacity: 0;
+  transition: var(--transition);
 }
 
 .staff-card:hover {
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
-  transform: translateY(-6px);
-  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  border-color: var(--color-border-strong);
 }
 
 .staff-card:hover::before {
-  transform: scaleX(1);
+  opacity: 1;
 }
 
 .staff-card-header {
@@ -441,22 +485,21 @@ input:checked + .sp-toggle-slider:before {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.375rem;
+  font-size: 1.5rem;
   font-weight: 700;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px var(--color-primary-ring);
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 0 0 2px var(--color-primary-ring);
+  transition: var(--transition);
 }
 
 .staff-card:hover .staff-avatar {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 16px var(--color-primary-ring);
+  transform: scale(1.05);
 }
 
 .staff-info {
@@ -465,47 +508,54 @@ input:checked + .sp-toggle-slider:before {
 }
 
 .staff-email {
-  margin: 0 0 0.5rem 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
   word-break: break-word;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .role-badge {
   display: inline-block;
-  padding: 0.35rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
+  border: 1px solid transparent;
 }
 
 .role-badge-cashier {
-  background: #dbeafe;
-  color: #1e40af;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
 }
 
 .role-badge-chef {
-  background: #fef3c7;
-  color: #92400e;
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
 }
 
 .role-badge-waiter {
-  background: #d1fae5;
-  color: #065f46;
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
 }
 
 .role-badge-manager {
-  background: #fce7f3;
-  color: #9d174d;
+  background: #fdf2f8;
+  color: #be185d;
+  border-color: #fbcfe8;
 }
 
 .staff-card-actions {
   display: flex;
   gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--color-border);
 }
 
 .permissions-list {
@@ -515,54 +565,60 @@ input:checked + .sp-toggle-slider:before {
 }
 
 .permission-badge {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-surface-alt);
+  color: var(--color-text-secondary);
   padding: 0.25rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-size: 0.75rem;
+  border: 1px solid var(--color-border);
 }
 
 .btn-card-action {
   flex: 1;
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-card-primary {
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-primary-light);
+  color: var(--color-primary-dark);
 }
 
 .btn-card-primary:hover {
-  background: var(--color-primary-dark);
+  background: var(--color-primary);
+  color: var(--color-surface);
   transform: translateY(-1px);
 }
 
 .btn-card-secondary {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-surface-alt);
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
 }
 
 .btn-card-secondary:hover {
-  background: #e5e7eb;
+  background: var(--color-bg);
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
   transform: translateY(-1px);
 }
 
 .btn-card-tertiary {
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--color-danger-light);
+  color: var(--color-danger-dark);
 }
 
 .btn-card-tertiary:hover {
-  background: #fecaca;
+  background: var(--color-danger);
+  color: var(--color-surface);
   transform: translateY(-1px);
 }
 

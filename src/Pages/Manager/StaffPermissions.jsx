@@ -6,24 +6,28 @@ import { getJson, postJson, putJson, deleteJson, getImageUrl } from '../../utils
 import Modal from '../../components/Modal';
 import './StaffPermissions.css';
 
+const PERMISSIONS_BY_ROLE = {
+  Manager: [],
+  Cashier: [
+    { id: 'pos.toggle_availability', label: 'Toggle Item Availability', description: 'Can make menu items available or unavailable' },
+    { id: 'pos.manage_discounts', label: 'Manage Discounts', description: 'Show Discount Setup page in Cashier module' },
+    { id: 'pos.process_refunds', label: 'Process Refunds', description: 'Access to Refund Management page' }
+  ],
+  Chef: [
+    { id: 'kitchen.manage_menu', label: 'Manage Menu', description: 'Access Menu Management (Add items/categories)' },
+    { id: 'kitchen.toggle_availability', label: 'Toggle Item Availability', description: 'Can make menu items available or unavailable' }
+  ]
+};
+
+function getDefaultPermissions(role) {
+  return (PERMISSIONS_BY_ROLE[role] || []).map(p => p.id);
+}
+
 export default function StaffPermissions() {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [permissionsModal, setPermissionsModal] = useState({ show: false, staff: null });
-
-  const PERMISSIONS_BY_ROLE = {
-    Manager: [],
-    Cashier: [
-      { id: 'pos.toggle_availability', label: 'Toggle Item Availability', description: 'Can make menu items available or unavailable' },
-      { id: 'pos.manage_discounts', label: 'Manage Discounts', description: 'Show Discount Setup page in Cashier module' },
-      { id: 'pos.process_refunds', label: 'Process Refunds', description: 'Access to Refund Management page' }
-    ],
-    Chef: [
-      { id: 'kitchen.manage_menu', label: 'Manage Menu', description: 'Access Menu Management (Add items/categories)' },
-      { id: 'kitchen.toggle_availability', label: 'Toggle Item Availability', description: 'Can make menu items available or unavailable' }
-    ]
-  };
 
 
   // Modal State
@@ -44,6 +48,7 @@ export default function StaffPermissions() {
     role: '',
     newPassword: ''
   });
+  const [formPermissions, setFormPermissions] = useState([]);
 
 
   useEffect(() => {
@@ -251,11 +256,18 @@ export default function StaffPermissions() {
         const emailNormalized = formData.email.trim().toLowerCase();
 
         // Use the new create-staff endpoint (no OTP, no password needed)
-        const response = await postJson('/api/auth/create-staff', {
+        const payload = {
           name: formData.name.trim() || null,
           email: emailNormalized,
           role: formData.role,
-        });
+        };
+
+        // Include permissions for Cashier/Chef (send the toggle state from the form)
+        if (formData.role === 'Cashier' || formData.role === 'Chef') {
+          payload.permissions = formPermissions.join(',');
+        }
+
+        const response = await postJson('/api/auth/create-staff', payload);
 
         console.log('Create staff response:', response);
 
@@ -327,6 +339,7 @@ export default function StaffPermissions() {
       role: '',
       newPassword: ''
     });
+    setFormPermissions([]);
   }
 
   function cancelForm() {
@@ -395,6 +408,8 @@ export default function StaffPermissions() {
           editingStaff={editingStaff}
           formData={formData}
           setFormData={setFormData}
+          formPermissions={formPermissions}
+          setFormPermissions={setFormPermissions}
           loading={loading}
           onCancel={cancelForm}
           onSubmit={handleSubmit}
@@ -491,11 +506,31 @@ function StaffFormModal({
   editingStaff,
   formData,
   setFormData,
+  formPermissions,
+  setFormPermissions,
   loading,
   onCancel,
   onSubmit
 }) {
   const [showPassword, setShowPassword] = useState(false);
+  const selectedRole = formData.role;
+  const availablePerms = PERMISSIONS_BY_ROLE[selectedRole] || [];
+  const showPermissions = !editingStaff && (selectedRole === 'Cashier' || selectedRole === 'Chef');
+
+  // When role changes during creation, auto-populate permissions with all defaults
+  const handleRoleChange = (newRole) => {
+    setFormData({ ...formData, role: newRole });
+    if (!editingStaff) {
+      setFormPermissions(getDefaultPermissions(newRole));
+    }
+  };
+
+  const togglePerm = (permId) => {
+    setFormPermissions(prev =>
+      prev.includes(permId) ? prev.filter(p => p !== permId) : [...prev, permId]
+    );
+  };
+
   return ReactDOM.createPortal(
     <div className="sp-modal-overlay" onClick={(e) => {
       if (e.target === e.currentTarget) onCancel();
@@ -566,7 +601,7 @@ function StaffFormModal({
                 <select
                   required
                   value={formData.role}
-                  onChange={e => setFormData({ ...formData, role: e.target.value })}
+                  onChange={e => handleRoleChange(e.target.value)}
                   disabled={loading}
                 >
                   <option value="">Select role</option>
@@ -574,6 +609,34 @@ function StaffFormModal({
                   <option value="Chef">Chef</option>
                   <option value="Waiter">Waiter</option>
                 </select>
+              </div>
+            )}
+
+            {/* Inline permissions toggles for new Cashier/Chef accounts */}
+            {showPermissions && availablePerms.length > 0 && (
+              <div className="sp-form-permissions">
+                <label className="sp-form-permissions-label">Permissions</label>
+                <p className="sp-form-permissions-hint">
+                  Choose which features this {selectedRole.toLowerCase()} can access.
+                </p>
+                <div className="sp-form-permissions-list">
+                  {availablePerms.map(perm => (
+                    <label key={perm.id} className="permission-item">
+                      <div className="sp-toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={formPermissions.includes(perm.id)}
+                          onChange={() => togglePerm(perm.id)}
+                        />
+                        <span className="sp-toggle-slider"></span>
+                      </div>
+                      <div>
+                        <div className="permission-label-text">{perm.label}</div>
+                        <div className="permission-desc-text">{perm.description}</div>
+                      </div>
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
 
