@@ -566,7 +566,7 @@ function StaffFormModal({
                 required
                 value={formData.email}
                 onChange={e => setFormData({ ...formData, email: e.target.value })}
-                disabled={loading}
+                disabled={loading || !!editingStaff}
                 placeholder="staff@example.com"
               />
               {!editingStaff && (

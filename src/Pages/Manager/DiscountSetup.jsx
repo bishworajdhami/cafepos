@@ -76,7 +76,7 @@ export default function DiscountSetup() {
 
     if (formData.discountType === 'percentage') {
       if (value > 100) {
-        setDiscountValueWarning('⚠️ Percentage discount cannot exceed 100%.');
+        setDiscountValueWarning('Percentage discount cannot exceed 100%.');
       } else {
         setDiscountValueWarning('');
       }
@@ -97,7 +97,7 @@ export default function DiscountSetup() {
 
       if (totalPrice > 0 && value > totalPrice) {
         setDiscountValueWarning(
-          `⚠️ Fixed discount (NRP ${value.toFixed(2)}) cannot exceed the total price of selected item(s) (NRP ${totalPrice.toFixed(2)}).`
+          `Fixed discount (NRP ${value.toFixed(2)}) cannot exceed the total price of selected item(s) (NRP ${totalPrice.toFixed(2)}).`
         );
       } else {
         setDiscountValueWarning('');
@@ -331,7 +331,7 @@ export default function DiscountSetup() {
 
         if (hasConflict) {
           const item = menuItems.find(m => m.id === itemId);
-          setConflictWarning(`⚠️ Item "${item?.name}" already has an active individual discount. This will be rejected by the server.`);
+          setConflictWarning(`Item "${item?.name}" already has an active individual discount. This will be rejected by the server.`);
           return;
         }
       }
@@ -343,7 +343,7 @@ export default function DiscountSetup() {
         const sortedExisting = existingCombo.menuItems?.map(mi => mi.id).sort((a, b) => a - b) || [];
 
         if (JSON.stringify(sortedNew) === JSON.stringify(sortedExisting)) {
-          setConflictWarning(`⚠️ A combo offer with this exact combination already exists: "${existingCombo.name}". This will be rejected by the server.`);
+          setConflictWarning(`A combo offer with this exact combination already exists: "${existingCombo.name}". This will be rejected by the server.`);
           return;
         }
       }
@@ -571,20 +571,20 @@ function DiscountFormModal({
         <form onSubmit={onSubmit} className="ds-modal-content-form" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
           <div className="ds-modal-body">
             {error && (
-              <div className="ds-alert error">
-                <span>⚠️</span> <span>{error}</span>
+              <div className="ds-alert ds-alert-error">
+                <FaExclamationTriangle className="ds-alert-icon" /> <span>{error}</span>
               </div>
             )}
 
             {conflictWarning && (
-              <div className="ds-alert warning">
-                <span>⚠️</span> <span>{conflictWarning}</span>
+              <div className="ds-alert ds-alert-warning">
+                <FaExclamationTriangle className="ds-alert-icon" /> <span>{conflictWarning}</span>
               </div>
             )}
 
             {discountValueWarning && (
-              <div className="ds-alert warning">
-                <span>{discountValueWarning}</span>
+              <div className="ds-alert ds-alert-warning">
+                <FaExclamationTriangle className="ds-alert-icon" /> <span>{discountValueWarning}</span>
               </div>
             )}
 

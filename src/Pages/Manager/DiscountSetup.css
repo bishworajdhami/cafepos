@@ -801,6 +801,39 @@
   box-shadow: 0 10px 25px -5px var(--color-primary-ring);
 }
 
+/* Custom Alerts for Modal */
+.ds-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+  animation: slideDown 0.3s ease-out;
+  border: 1px solid transparent;
+}
+
+.ds-alert-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  font-size: 1.1rem;
+}
+
+.ds-alert-error {
+  background-color: var(--color-danger-light);
+  color: var(--color-danger-dark);
+  border-color: #fca5a5;
+}
+
+.ds-alert-warning {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning-dark);
+  border-color: #fcd34d;
+}
+
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 0.2; }
   50% { transform: scale(1.1); opacity: 0.4; }
