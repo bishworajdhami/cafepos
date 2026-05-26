@@ -17,9 +17,9 @@ export default function SettingsSkeleton({ count = 6 }) {
       }}>
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: '12px',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-xl)',
             padding: '1.25rem',
             display: 'flex',
             alignItems: 'center',
@@ -42,9 +42,9 @@ export default function SettingsSkeleton({ count = 6 }) {
             ) : (
               /* Number control: − [n] + */
               <div className="skel-row" style={{ gap: '0.3rem', flexShrink: 0 }}>
-                <span className="skel" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
-                <span className="skel" style={{ width: '40px', height: '28px', borderRadius: '6px' }} />
-                <span className="skel" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+                <span className="skel" style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-md)' }} />
+                <span className="skel" style={{ width: '40px', height: '28px', borderRadius: 'var(--radius-md)' }} />
+                <span className="skel" style={{ width: '28px', height: '28px', borderRadius: 'var(--radius-md)' }} />
               </div>
             )}
           </div>

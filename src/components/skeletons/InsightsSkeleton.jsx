@@ -20,9 +20,9 @@ export default function InsightsSkeleton() {
       }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: '12px',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-xl)',
             padding: '1.25rem',
             display: 'flex',
             flexDirection: 'column',
@@ -43,9 +43,9 @@ export default function InsightsSkeleton() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         {Array.from({ length: 2 }).map((_, ci) => (
           <div key={ci} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: '12px',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-xl)',
             padding: '1.25rem',
             display: 'flex',
             flexDirection: 'column',

@@ -13,15 +13,15 @@ export default function TableBookingSkeleton({ viewMode = 'visual' }) {
       <div className="skel-page-wrapper">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: '12px',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-xl)',
             overflow: 'hidden',
           }}>
             {/* Header: customer name + status badge */}
             <div style={{
               padding: '0.85rem 1rem',
-              borderBottom: '1px solid var(--color-border, #e2e8f0)',
+              borderBottom: '1px solid var(--color-border)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -47,13 +47,13 @@ export default function TableBookingSkeleton({ viewMode = 'visual' }) {
             {/* Footer actions */}
             <div style={{
               padding: '0.65rem 1rem',
-              borderTop: '1px solid var(--color-border, #e2e8f0)',
+              borderTop: '1px solid var(--color-border)',
               display: 'flex',
               gap: '0.5rem',
               justifyContent: 'flex-end',
             }}>
-              <span className="skel" style={{ width: '80px', height: '32px', borderRadius: '6px' }} />
-              <span className="skel" style={{ width: '90px', height: '32px', borderRadius: '6px' }} />
+              <span className="skel" style={{ width: '80px', height: '32px', borderRadius: 'var(--radius-md)' }} />
+              <span className="skel" style={{ width: '90px', height: '32px', borderRadius: 'var(--radius-md)' }} />
             </div>
           </div>
         ))}
@@ -80,7 +80,7 @@ export default function TableBookingSkeleton({ viewMode = 'visual' }) {
             alignItems: 'center',
             gap: '0.5rem',
           }}>
-            <span className="skel" style={{ width: '90px', height: '90px', borderRadius: '12px' }} />
+            <span className="skel" style={{ width: '90px', height: '90px', borderRadius: 'var(--radius-xl)' }} />
             <span className="skel skel-sm" style={{ width: '50px' }} />
           </div>
         ))}

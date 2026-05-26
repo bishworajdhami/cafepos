@@ -17,8 +17,8 @@ export default function StockSkeleton({ rows = 8 }) {
       }}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
             borderRadius: '10px',
             padding: '1rem',
             display: 'flex',
@@ -37,8 +37,8 @@ export default function StockSkeleton({ rows = 8 }) {
 
       {/* Table ghost */}
       <div style={{
-        background: 'var(--color-surface, #fff)',
-        border: '1px solid var(--color-border, #e2e8f0)',
+        background: 'var(--color-surface)',
+        border: '1px solid var(--color-border)',
         borderRadius: '10px',
         overflow: 'hidden',
       }}>
@@ -48,7 +48,7 @@ export default function StockSkeleton({ rows = 8 }) {
           gridTemplateColumns: '2fr 1fr 1.5fr 1.5fr 1fr 1.2fr',
           gap: '1rem',
           padding: '0.85rem 1rem',
-          borderBottom: '2px solid var(--color-border, #e2e8f0)',
+          borderBottom: '2px solid var(--color-border)',
           background: 'var(--color-surface-alt, #f8fafc)',
         }}>
           {['2fr', '1fr', '1.5fr', '1.5fr', '1fr', '1.2fr'].map((_, ci) => (
@@ -63,7 +63,7 @@ export default function StockSkeleton({ rows = 8 }) {
             gridTemplateColumns: '2fr 1fr 1.5fr 1.5fr 1fr 1.2fr',
             gap: '1rem',
             padding: '0.85rem 1rem',
-            borderBottom: '1px solid var(--color-border, #e2e8f0)',
+            borderBottom: '1px solid var(--color-border)',
           }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
               <span className="skel skel-sm" style={{ width: '80%' }} />

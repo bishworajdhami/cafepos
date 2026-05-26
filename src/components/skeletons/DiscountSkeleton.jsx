@@ -16,48 +16,78 @@ export default function DiscountSkeleton({ count = 4 }) {
       }}>
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: '12px',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-xl)',
             overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           }}>
-            {/* Card header: name + status badges */}
-            <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              <span className="skel skel-lg" style={{ width: '60%' }} />
-              {/* Badge row */}
-              <div className="skel-row" style={{ gap: '0.4rem' }}>
-                <span className="skel skel-sm" style={{ width: '70px', borderRadius: '20px' }} />
-                <span className="skel skel-sm" style={{ width: '55px', borderRadius: '20px' }} />
-                <span className="skel skel-sm" style={{ width: '80px', borderRadius: '20px' }} />
+            {/* 1. Header Row */}
+            <div style={{
+              padding: '1rem 1.25rem',
+              background: 'var(--color-surface-alt)',
+              borderBottom: '1px solid var(--color-border)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1 }}>
+                <span className="skel skel-xs" style={{ width: '40%' }} />
+                <span className="skel skel-md" style={{ width: '70%' }} />
+              </div>
+              <span className="skel skel-sm" style={{ width: '80px', borderRadius: '2rem' }} />
+            </div>
+
+            {/* 2. Meta Row */}
+            <div style={{
+              padding: '0.75rem 1.25rem',
+              background: 'var(--color-surface)',
+              borderBottom: '1px dashed var(--color-border)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+              <span className="skel skel-sm" style={{ width: '100px', borderRadius: '0.5rem' }} />
+              <span className="skel skel-md" style={{ width: '80px', borderRadius: '0.5rem' }} />
+            </div>
+
+            {/* 3. Body Content */}
+            <div style={{
+              padding: '1.25rem',
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.25rem',
+            }}>
+              {/* Description box */}
+              <span className="skel" style={{ height: '48px', borderRadius: '0.75rem', width: '100%' }} />
+              
+              {/* Items */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <span className="skel skel-xs" style={{ width: '120px' }} />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {Array.from({ length: 4 }).map((_, ti) => (
+                    <span key={ti} className="skel skel-sm" style={{ width: `${50 + (ti * 10)}px`, borderRadius: '0.35rem' }} />
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Item tags */}
+            {/* 4. Footer Actions */}
             <div style={{
-              padding: '0 1rem 1rem',
+              padding: '1rem 1.25rem',
+              background: 'var(--color-surface-alt)',
+              borderTop: '1px solid var(--color-border)',
               display: 'flex',
-              flexWrap: 'wrap',
-              gap: '0.4rem',
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}>
-              {Array.from({ length: 3 }).map((_, ti) => (
-                <span key={ti} className="skel skel-sm" style={{
-                  width: `${60 + ti * 20}px`,
-                  borderRadius: '20px',
-                }} />
-              ))}
-            </div>
-
-            {/* Card footer: 3 action buttons */}
-            <div style={{
-              padding: '0.75rem 1rem',
-              borderTop: '1px solid var(--color-border, #e2e8f0)',
-              display: 'flex',
-              gap: '0.5rem',
-              justifyContent: 'flex-end',
-            }}>
-              {Array.from({ length: 3 }).map((_, bi) => (
-                <span key={bi} className="skel" style={{ width: '72px', height: '32px', borderRadius: '6px' }} />
-              ))}
+              <span className="skel skel-circle" style={{ width: '40px', height: '40px' }} />
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
+                <span className="skel" style={{ width: '72px', height: '36px', borderRadius: '0.6rem' }} />
+                <span className="skel" style={{ width: '40px', height: '36px', borderRadius: '0.6rem' }} />
+              </div>
             </div>
           </div>
         ))}

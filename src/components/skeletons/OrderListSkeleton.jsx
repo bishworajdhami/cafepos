@@ -11,15 +11,15 @@ export default function OrderListSkeleton({ count = 5 }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '0.5rem' }}>
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} style={{
-          background: 'var(--color-surface, #fff)',
-          border: '1px solid var(--color-border, #e2e8f0)',
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
           borderRadius: '10px',
           overflow: 'hidden',
         }}>
           {/* Header row: #ID + type badge */}
           <div style={{
             padding: '0.7rem 0.85rem',
-            borderBottom: '1px solid var(--color-border, #e2e8f0)',
+            borderBottom: '1px solid var(--color-border)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',

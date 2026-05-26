@@ -22,9 +22,9 @@ export default function MenuSkeleton({ groups = 2, cardsPerGroup = 4 }) {
           }}>
             {Array.from({ length: cardsPerGroup }).map((_, ci) => (
               <div key={ci} style={{
-                background: 'var(--color-surface, #fff)',
+                background: 'var(--color-surface)',
                 borderRadius: '10px',
-                border: '1px solid var(--color-border, #e2e8f0)',
+                border: '1px solid var(--color-border)',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
@@ -40,7 +40,7 @@ export default function MenuSkeleton({ groups = 2, cardsPerGroup = 4 }) {
                 {/* Card footer */}
                 <div style={{
                   padding: '0.5rem 0.75rem',
-                  borderTop: '1px solid var(--color-border, #e2e8f0)',
+                  borderTop: '1px solid var(--color-border)',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',

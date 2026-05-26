@@ -17,8 +17,8 @@ export default function ItemAvailabilitySkeleton({ groups = 2, itemsPerGroup = 4
           {/* Toggle card rows */}
           {Array.from({ length: itemsPerGroup }).map((_, ii) => (
             <div key={ii} style={{
-              background: 'var(--color-surface, #fff)',
-              border: '1px solid var(--color-border, #e2e8f0)',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
               borderRadius: '10px',
               padding: '0.75rem 1rem',
               display: 'flex',

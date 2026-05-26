@@ -29,9 +29,9 @@ export default function OrderCardsSkeleton({ count = 6, showStats = false }) {
       }}>
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: '12px',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-xl)',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column',
@@ -40,7 +40,7 @@ export default function OrderCardsSkeleton({ count = 6, showStats = false }) {
             {/* Card header row: ID + type badge */}
             <div style={{
               padding: '0.85rem 1rem',
-              borderBottom: '1px solid var(--color-border, #e2e8f0)',
+              borderBottom: '1px solid var(--color-border)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -75,13 +75,13 @@ export default function OrderCardsSkeleton({ count = 6, showStats = false }) {
             {/* Footer: total + status btn */}
             <div style={{
               padding: '0.65rem 1rem',
-              borderTop: '1px solid var(--color-border, #e2e8f0)',
+              borderTop: '1px solid var(--color-border)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
             }}>
               <span className="skel skel-md" style={{ width: '80px' }} />
-              <span className="skel" style={{ width: '100px', height: '34px', borderRadius: '8px' }} />
+              <span className="skel" style={{ width: '100px', height: '34px', borderRadius: 'var(--radius-md)' }} />
             </div>
           </div>
         ))}

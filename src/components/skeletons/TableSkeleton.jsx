@@ -14,8 +14,8 @@ export default function TableSkeleton({ cols = 6, rows = 6, compact = false }) {
   const pad = compact ? '0.5rem 0.75rem' : '0.85rem 1rem';
   return (
     <div style={{
-      background: 'var(--color-surface, #fff)',
-      border: compact ? 'none' : '1px solid var(--color-border, #e2e8f0)',
+      background: 'var(--color-surface)',
+      border: compact ? 'none' : '1px solid var(--color-border)',
       borderRadius: compact ? 0 : '10px',
       overflow: 'hidden',
     }}>
@@ -25,7 +25,7 @@ export default function TableSkeleton({ cols = 6, rows = 6, compact = false }) {
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gap: '0.75rem',
         padding: pad,
-        borderBottom: '2px solid var(--color-border, #e2e8f0)',
+        borderBottom: '2px solid var(--color-border)',
         background: 'var(--color-surface-alt, #f8fafc)',
       }}>
         {Array.from({ length: cols }).map((_, ci) => (
@@ -40,7 +40,7 @@ export default function TableSkeleton({ cols = 6, rows = 6, compact = false }) {
           gridTemplateColumns: `repeat(${cols}, 1fr)`,
           gap: '0.75rem',
           padding: pad,
-          borderBottom: '1px solid var(--color-border, #e2e8f0)',
+          borderBottom: '1px solid var(--color-border)',
         }}>
           {Array.from({ length: cols }).map((_, ci) => (
             <span key={ci} className="skel skel-sm" style={{

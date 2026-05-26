@@ -11,43 +11,46 @@ export default function StaffSkeleton({ count = 6 }) {
     <div className="skel-page-wrapper">
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-        gap: '1.25rem',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        gap: '1.5rem',
       }}>
         {Array.from({ length: count }).map((_, i) => (
           <div key={i} style={{
-            background: 'var(--color-surface, #fff)',
-            border: '1px solid var(--color-border, #e2e8f0)',
-            borderRadius: '12px',
-            overflow: 'hidden',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1.25rem',
           }}>
             {/* Card header */}
             <div style={{
-              padding: '1.25rem',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.6rem',
-              borderBottom: '1px solid var(--color-border, #e2e8f0)',
+              gap: '1rem',
             }}>
               {/* Avatar */}
-              <span className="skel skel-circle" style={{ width: '64px', height: '64px' }} />
-              {/* Name */}
-              <span className="skel skel-md" style={{ width: '120px' }} />
-              {/* Email */}
-              <span className="skel skel-sm" style={{ width: '160px' }} />
-              {/* Role badge */}
-              <span className="skel skel-sm" style={{ width: '80px', borderRadius: '20px' }} />
+              <span className="skel skel-circle" style={{ width: '56px', height: '56px', flexShrink: 0 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1 }}>
+                {/* Name */}
+                <span className="skel skel-md" style={{ width: '120px' }} />
+                {/* Email */}
+                <span className="skel skel-sm" style={{ width: '160px' }} />
+                {/* Role badge */}
+                <span className="skel skel-sm" style={{ width: '70px', borderRadius: '9999px', marginTop: '0.2rem' }} />
+              </div>
             </div>
             {/* Card actions */}
             <div style={{
-              padding: '0.75rem 1rem',
               display: 'flex',
-              gap: '0.5rem',
-              justifyContent: 'flex-end',
+              gap: '0.75rem',
+              paddingTop: '1.25rem',
+              borderTop: '1px dashed var(--color-border)',
             }}>
-              <span className="skel" style={{ width: '80px', height: '32px', borderRadius: '6px' }} />
-              <span className="skel" style={{ width: '80px', height: '32px', borderRadius: '6px' }} />
+              <span className="skel" style={{ flex: 1, height: '36px', borderRadius: 'var(--radius-md)' }} />
+              <span className="skel" style={{ flex: 1, height: '36px', borderRadius: 'var(--radius-md)' }} />
+              <span className="skel" style={{ flex: 1, height: '36px', borderRadius: 'var(--radius-md)' }} />
             </div>
           </div>
         ))}
