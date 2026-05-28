@@ -387,7 +387,7 @@ export default function BusinessInsights() {
                   return (
                     <div key={index} className="payment-stat-item">
                       <div className="payment-label">
-                        <span>{method.method}</span>
+                        <span>{method.method.charAt(0).toUpperCase() + method.method.slice(1)}</span>
                         <span style={{ whiteSpace: 'nowrap' }}>{percent.toFixed(1)}% (NRP {method.total.toLocaleString(undefined, { maximumFractionDigits: 0 })})</span>
                       </div>
                       <div className="payment-progress-bg">
